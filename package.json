@@ -7,6 +7,7 @@
     "build": "vue-cli-service build"
   },
   "dependencies": {
+    "@tweenjs/tween.js": "^18.6.4",
     "axios": "^0.27.2",
     "core-js": "^3.8.3",
     "dat.gui": "^0.7.9",
@@ -14,6 +15,7 @@
     "mitt": "^3.0.0",
     "postprocessing": "^6.29.1",
     "three": "^0.143.0",
+    "three.proton.js": "^0.2.3",
     "vue": "^3.2.13",
     "vue-router": "^4.0.3",
     "vuex": "^4.0.0"

@@ -13,7 +13,8 @@ import gsap from 'gsap'
 // 导入gui
 import gui from '@/three/gui'
 
-import ThreePlus from '@/three/index.js'
+// import ThreePlus from '@/three/index.js'
+import ThreePlus from '@/three/scene/Particle.js'
 
 
 

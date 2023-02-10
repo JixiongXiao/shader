@@ -31,8 +31,13 @@ void main() {
     vec2 ipos = floor(st);  // integer
     vec2 fpos = fract(st);  // fraction
 
+    //色块纵向移动
     vec2 vel = vec2(uelapseTime*.5*max(grid.y,grid.x)); // time
     vel *= vec2(0.0,-1.0) * random(0.5+ipos.x); // direction
+
+    // 色块横向移动
+    // vec2 vel = vec2(uelapseTime*.5*max(grid.y,grid.x)); // time
+    // vel *= vec2(1.0,0.0) * random(0.5+ipos.y); // direction
 
     // Assign a random value base on the integer coord
     vec2 offset = vec2(0.0,0.1);
@@ -42,7 +47,7 @@ void main() {
     color.g = pattern(st,vel,0.998);
     color.b = pattern(st+offset,vel,0.998);
 
-    // Margins
+    // Margins 色块之间的间隔
     color *= step(0.2,fpos.x);
 
     gl_FragColor = vec4(0.1, vUv.y, 0.8,color);
