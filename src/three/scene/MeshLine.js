@@ -1,9 +1,8 @@
 import * as THREE from "three";
 import * as TWEEN from "@tweenjs/tween.js";
-import Proton from 'three.proton.js';
-
 
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+import { MeshLine, MeshLineMaterial, MeshLineRaycast } from 'three.meshline';
 
 
 export default class ThreePlus {
@@ -14,15 +13,28 @@ export default class ThreePlus {
         this.height = this.domElement.clientHeight
         this.mixer = null
         this.cameraCanMove = false
-        this.pointerSpeed = 0.5;
-        this.originAngle = null; // radians
-		this.maxAngle = null; // radians
-        this._euler = new THREE.Euler(0,0,0,'XYZ')
         this.raycaster = new THREE.Raycaster()
         this.mouse = new THREE.Vector2()
         this.elapsedTime = {
             value:0
         }
+        this.color = [
+            0xed6a5a,
+            0xf4f1bb,
+            0x9bc1bc,
+            0x5ca4a9,
+            0xe6ebe0,
+            0xf0b67f,
+            0xfe5f55,
+            0xd6d1b1,
+            0xc7efcf,
+            0xeef5db,
+            0x50514f,
+            0xf25f5c,
+            0xffe066,
+            0x247ba0,
+            0x70c1b3
+        ]
         this.init()
     }
 
@@ -55,7 +67,6 @@ export default class ThreePlus {
         )
         // 3设置相机位置
         this.camera.position.set(-5.5, 3.7, 7.5);
-        // this.setAngle1()
         this.camera.updateProjectionMatrix();
         
     }
@@ -112,103 +123,55 @@ export default class ThreePlus {
         if(this.mixer) {
             this.mixer.update(deltaTime)
         }
-        if(this.proton){
-
-            this.proton.update()
-        }
         this.raycaster.setFromCamera(this.mouse, this.camera)
         this.renderer.render(this.scene, this.camera)
     }
     taskQueue() {
-        // this.createParticle1() // 瀑布型粒子
-        this.createParticle2() // 火焰粒子
-        // this.addListenser() // 测试动画暂停
+        this.createLines1()
     }
-    createParticle1() {
-        this.proton = new Proton()
-        var emitter1 = this.createEmitter1({
-            p:{
-                x:0,
-                y:0
-            },
-            Body:this.createMesh1('cube')
+    makeLine1(geometry, colorIndex) {
+        const texture = new THREE.TextureLoader().load('./textures/spriteline3.png');
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.RepeatWrapping;
+        // texture.mapping = THREE.EquirectangularReflectionMapping
+        texture.repeat.set( 1, 1 );
+        const g = new MeshLine()
+        g.setPoints(geometry)
+        const material = new MeshLineMaterial({
+            useMap:false,
+            // map:texture,
+            color:new THREE.Color(this.color[colorIndex]),
+            opacity:0.8,
+            resolution:new THREE.Vector2(this.width,this.height),
+            sizeAttenuation:false,
+            lineWidth:20
         })
-        this.proton.addEmitter(emitter1)
-        this.proton.addRender(new Proton.MeshRender(this.scene))
+        const mesh = new THREE.Mesh(g, material)
+        this.scene.add(mesh)
     }
-    createEmitter1(obj) { // 瀑布粒子
-        var emitter = new Proton.Emitter();
-        // 每秒粒子数量，第一个参数为数量，如果有2个参数，则是参数a到参数b随机，比如new Proton.Span(1, 5)就是1到5之间的随机数
-        //第二个参数为粒子发射间隔时间,如果参数只有1个，那就是每N秒发射一次，如果有2个参数就是参数a到参数b的随机数
-        emitter.rate = new Proton.Rate(new Proton.Span(5, 10), new Proton.Span(0.1,0.3)); 
-        emitter.addInitialize(new Proton.Mass(0.2));// 粒子投射的力度
-        emitter.addInitialize(new Proton.Radius(2,3)); // 粒子发射时的角度，第一个参数为起始点的角度，第二个参数为结束点的角度
-        emitter.addInitialize(new Proton.Life(2,1)); //粒子存在时间
-        emitter.addInitialize(new Proton.Body(obj.Body));
-        emitter.addInitialize(new Proton.Position(new Proton.BoxZone(10)));// emitter初值位置的发射范围，越小粒子发射点越集中
-        emitter.addInitialize(new Proton.Velocity(100, new Proton.Vector3D(1, 1, 1), 10));// 发射速度，发射方向,发射方向离散值，第三个数值越小粒子朝向越统一 
-
-        emitter.addBehaviour(new Proton.Rotate("random", "random"));
-        emitter.addBehaviour(new Proton.Scale(1, 0.1)); // 尺寸，第一个参数为起始大小，第二个参数为消失前大小
-        //Gravity
-        emitter.addBehaviour(new Proton.Gravity(1));// 粒子下坠的重力
-
-        emitter.p.x = obj.p.x;
-        emitter.p.y = obj.p.y;
-        emitter.emit();
-        return emitter;
-    }
-    createMesh1(geo) {
-        if (geo == "sphere") {
-            var geometry = new THREE.SphereGeometry(10, 8, 8);
-            var material = new THREE.MeshLambertMaterial({
-                color: "#ff0000"
-            });
-        } else {
-            var geometry = new THREE.BoxGeometry(1, 1, 1);
-            var material = new THREE.MeshLambertMaterial({
-                color: "#00ffcc"
-            });
+    createLines1() {
+        var line = new Float32Array(600)
+        for( var j = 0; j < 200 * 3; j += 3 ) {
+            line[ j ] = -30 + .1 * j;
+            line[ j + 1 ] = 5 * Math.sin( .01 *  j );
+            line[ j + 2 ] = -20;
         }
-
-        var mesh = new THREE.Mesh(geometry, material);
-        return mesh;
-    }
-    createParticle2(){ // 火焰粒子
-        this.proton = new Proton();
-        this.proton.addEmitter(this.createEmitter2());
-        this.proton.addRender(new Proton.SpriteRender(this.scene));
-    }
-    createSprite2() {
-        var map = new THREE.TextureLoader().load("./textures/particle/dot.png");
-        var material = new THREE.SpriteMaterial({
-            map: map,
-            color: 0xff0000,
-            blending: THREE.AdditiveBlending,
-            fog: true
-        });
-        var sprite = new THREE.Sprite(material)
-        return sprite;
-    }
-    createEmitter2() {
-        var emitter = new Proton.Emitter();
-        emitter.rate = new Proton.Rate(new Proton.Span(15, 20), new Proton.Span(.08, .1));
-        emitter.addInitialize(new Proton.Body(this.createSprite2()));
-        emitter.addInitialize(new Proton.Mass(0.3));
-        emitter.addInitialize(new Proton.Life(0, 1.5));
-        emitter.addInitialize(new Proton.Position(new Proton.SphereZone(3)));
-        // emitter.addInitialize(new Proton.Scale(1))
-        emitter.addInitialize(new Proton.V(new Proton.Span(300, 480), new Proton.Vector3D(0, 1, 0), 5)); // 火焰高度，火焰角度和火苗分散角度
-        emitter.addBehaviour(new Proton.RandomDrift(10, 10, 10, .05)); // x,y,z三个方向的漂移值
-        //emitter.addBehaviour(new Proton.Alpha(1, 0.1));
-        // emitter.addBehaviour(new Proton.Scale(0.5, 0));
-        emitter.addBehaviour(new Proton.Scale(new Proton.Span(0.6, 0.8), 0));
-        emitter.addBehaviour(new Proton.G(4));
-        emitter.addBehaviour(new Proton.Color(['#FFC12F','#FF8024'], ['#ffff00', '#ffff11'], Infinity, Proton.easeOutSine));
-        emitter.p.x = 0;
-        emitter.p.y = 0;
-        emitter.emit();
-        return emitter;
+        this.makeLine1( line, 0 );
+        var line = new Float32Array( 600 );
+        for( var j = 0; j < 200 * 3; j += 3 ) {
+            line[ j ] = -30 + .1 * j;
+            line[ j + 1 ] = 5 * Math.cos( .02 *  j );
+            line[ j + 2 ] = -10;
+        }
+        this.makeLine1( line, 1 );
+        
+	    var line = new Float32Array( 600 );
+	    for( var j = 0; j < 200 * 3; j += 3 ) {
+	    	line[ j ] = -30 + .1 * j;
+	    	line[ j + 1 ] = 5 * Math.sin( .01 *  j ) * Math.cos( .005 * j );
+	    	line[ j + 2 ] = 0;
+	    }
+	    this.makeLine1( line, 2 );
     }
     addListenser() {
         window.addEventListener('dblclick',()=>{
@@ -219,25 +182,7 @@ export default class ThreePlus {
         window.addEventListener('mouseup',()=>{
             this.cameraCanMove = false
         })
-        window.addEventListener('mousemove',(event)=>{
-            if(this.cameraCanMove){
-			const movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
-            this._euler.setFromQuaternion(this.camera.quaternion)
-            this._euler.y -= movementX * 0.002 * this.pointerSpeed;
-            if(this.maxAngle.y > -0.4 && this.maxAngle.y <= this.originAngle.y){
-                this.camera.quaternion.setFromEuler(this._euler)
-                this.maxAngle = this._euler
-            }
-            }
-        })
         
-    }
-    setAngle1() {
-        this.camera.lookAt(new THREE.Vector3(-4.5,1.9,-0.85))
-        const euler = new THREE.Euler(0,0,0,'XYZ')
-        euler.setFromQuaternion(this.camera.quaternion)
-        this.originAngle = euler
-        this.maxAngle = euler
     }
 
 }
