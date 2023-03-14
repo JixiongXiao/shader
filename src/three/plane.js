@@ -23,6 +23,7 @@ export default class Plane {
       // wireframe:true,
       transparent: true,
       side: THREE.DoubleSide,
+      opacity: 0.5,
       uniforms: {
         uTime: {
           value: 0,
@@ -61,7 +62,7 @@ export default class Plane {
         },
       },
       vertexShader: vertex,
-      fragmentShader: plane4fragment,
+      fragmentShader: plane5fragment,
     });
     this.mesh = new THREE.Mesh(this.geometry, this.shaderMaterial);
   }

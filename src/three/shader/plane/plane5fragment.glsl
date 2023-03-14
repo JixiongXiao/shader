@@ -28,6 +28,7 @@ void main()
 	
 	// Output to screen
 	gl_FragColor = screenColor(saturate(sinLine + grid));
+	
 }
 // 底下为原版备份
 // varying vec2 vUv; 

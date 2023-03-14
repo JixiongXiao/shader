@@ -11,7 +11,7 @@ void main()
 	vec2 uv = vUv * a;
     float dt = sin(mod(length((uv - vec2(0.5 * a, 0.5 * a)) * 1.) - uelapseTime * t, 3.14));
     float circle = (cos(mod(uv.x * 32.0, 3.14) - 1.58) *0.5) *(sin(mod(uv.y * 32.0, 3.14)) *0.5) * (1.-dt);
-	gl_FragColor = vec4(vUv,0.5, 1. - dt); // 圆圈向外扩散，
-	// gl_FragColor = vec4(1,4,12,1) * circle; // 圆圈向外扩散特效加网格球点
+	// gl_FragColor = vec4(vUv,0.5, 1. - dt); // 圆圈向外扩散，
+	gl_FragColor = vec4(1,4,12,1) * circle; // 圆圈向外扩散特效加网格球点
 	// gl_FragColor = mix(textureColor, vec4(uColor, dt - .5),  1. - dt); // 双层扩散加纹理，
 }
