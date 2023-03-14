@@ -16,7 +16,8 @@ import gui from "@/three/gui";
 // import ThreePlus from "@/three/scene/animation.js"; //自定义动画使模型根据路径移动
 // import ThreePlus from '@/three/scene/Particle.js' //粒子
 // import ThreePlus from '@/three/scene/MeshLine.js'
-import ThreePlus from "@/three/scene/mirror.js"; // 镜面特效 multilPass
+// import ThreePlus from "@/three/scene/mirror.js"; // 镜面特效 multilPass
+import ThreePlus from "@/three/scene/galaxy.js"; // 银河 星空
 
 // 场景元素声明
 let screenDom = ref(null);
