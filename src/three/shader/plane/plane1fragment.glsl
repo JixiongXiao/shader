@@ -14,4 +14,7 @@ void main()
 	// gl_FragColor = vec4(vUv,0.5, 1. - dt); // 圆圈向外扩散，
 	gl_FragColor = vec4(1,4,12,1) * circle; // 圆圈向外扩散特效加网格球点
 	// gl_FragColor = mix(textureColor, vec4(uColor, dt - .5),  1. - dt); // 双层扩散加纹理，
+    // vec2 c = vec2 (100.6,1.3);
+    // vec2 a = round(c);
+    // gl_FragColor = vec4(a,0.4,1.0);
 }

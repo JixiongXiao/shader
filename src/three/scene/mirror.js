@@ -205,6 +205,9 @@ export default class ThreePlus {
     if (this.mixer) {
       this.mixer.update(deltaTime);
     }
+    if (this.mirrorPlane) {
+      this.mirrorPlane.material.update();
+    }
     this.raycaster.setFromCamera(this.mouse, this.camera);
   }
   taskQueue() {
@@ -254,7 +257,8 @@ export default class ThreePlus {
       this.scene.add(this.lion);
       this.models.push(this.lion);
     });
-    this.createMirror1();
+    // this.createMirror1();
+    this.createMirror2();
   }
   createMirror1() {
     const geometry = new THREE.PlaneGeometry(10, 10, 512, 512);
@@ -263,6 +267,7 @@ export default class ThreePlus {
       opacity: 0.5,
       roughness: 0.9,
       metalness: 0.6,
+      // 可增加map
     });
     const groundMirror = new ReflectorMesh(geometry, {
       clipBias: 0.003,
@@ -272,9 +277,57 @@ export default class ThreePlus {
       material: mirrorMaterial,
       reflectorFactor: 0.3,
     });
-    // groundMirror.rotation.x = -Math.PI / 2;
-    groundMirror.position.set(0, 0, -3);
+    groundMirror.rotation.x = -Math.PI / 2;
+    // groundMirror.position.set(0, 0, -3);
     this.scene.add(groundMirror);
+  }
+  createMirror2() {
+    const geometry = new THREE.PlaneGeometry(10, 10, 512, 512);
+    const material = new THREE.MeshStandardMaterial({
+      color: 0xffffff,
+      roughness: 0.7,
+      metalness: 0.1,
+    });
+    const plane = new THREE.Mesh(geometry, material);
+    plane.rotateX(-Math.PI / 2);
+    this.scene.add(plane);
+    plane.material = new MeshReflectorMaterial(
+      this.renderer,
+      this.camera,
+      this.scene,
+      plane,
+      {
+        resolution: 1024,
+        blur: [19, 80], // 倒影模糊
+        mixBlur: 1.04,
+        mixStrength: 1,
+        mixContrast: 0.7,
+        mirror: 1.8,
+        depthScale: 2,
+        distortion: 2,
+        minDepthThreshold: 0.0, //代表到多远的地方会淡出到没画面
+        maxDepthThreshold: 0.9, //代表从多远的地方开始淡出
+        // resolution: 512,
+        // blur: [30, 19], // 倒影模糊
+        // mixBlur: 1.03,
+        // mixStrength: 1,
+        // mixContrast: 0.5,
+        // mirror: 1.2,
+        // depthScale: 1.2,
+        // distortion: 2,
+        // minDepthThreshold: 0.2, //代表到多远的地方会淡出到没画面
+        // maxDepthThreshold: 0.3, //代表从多远的地方开始淡出
+      }
+    );
+    plane.receiveShadow = true;
+    plane.material.setValues({
+      map: this.floorMap,
+      normalMap: this.floorMapNormal,
+      normalScale: new THREE.Vector2(0, 0.1),
+      roughness: 0.7,
+      metalness: 0.1,
+    });
+    this.mirrorPlane = plane;
   }
   testSsaoEffect() {
     const planeGeometry = new THREE.PlaneGeometry(50, 50);

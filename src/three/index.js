@@ -87,9 +87,9 @@ export default class ThreePlus {
     const rgbeLoader = new RGBELoader();
     rgbeLoader.load("./textures/powerplant.hdr", (tex) => {
       tex.mapping = THREE.EquirectangularReflectionMapping; // 环境模糊效果
-      this.scene.background = tex;
-      this.scene.environment = tex;
-      this.scene.backgroundBlurriness = 1;
+      // this.scene.background = tex;
+      // this.scene.environment = tex;
+      // this.scene.backgroundBlurriness = 1;
     });
   }
   render() {
