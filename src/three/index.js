@@ -15,6 +15,7 @@ import Wall from "./wall";
 import Water from "./water";
 import Points from "./point";
 import Flow from "./flow";
+import BoxEffect from "./box";
 
 export default class ThreePlus {
   constructor(selector) {
@@ -104,14 +105,15 @@ export default class ThreePlus {
     // this.createFlow()
     // this.createPoint()
     // this.createWater()
-    // this.createWall()
+    // this.createWall(); //墙面特效 4面圆柱体
     // this.createGrid() // 网格棋盘特效
-    this.createPlane(); // 平面底特效
+    // this.createPlane(); // 平面底特效
     // this.createTunnel() // 巷道
     // this.createPipe() // 管道
     // this.createTunnelComplete() // 完整巷道
     // this.createExample() // 练习案例
     // this.createFlyLine() // 创建飞线
+    this.createBox(); // 盒子模型特效
   }
   // 创建网格平面
   createGrid() {
@@ -266,5 +268,10 @@ export default class ThreePlus {
   createFlow() {
     this.waterFlow = new Flow(this.elapsedTime);
     this.scene.add(this.waterFlow.mesh);
+  }
+  // 盒子模型特效
+  createBox() {
+    this.boxEffect = new BoxEffect(this.elapsedTime);
+    this.scene.add(this.boxEffect.mesh);
   }
 }
