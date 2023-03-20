@@ -102,7 +102,7 @@ export default class ThreePlus {
   }
   taskQueue() {
     this.initBackground();
-    // this.createFlow()
+    // this.createFlow();
     // this.createPoint()
     // this.createWater()
     // this.createWall(); //墙面特效 4面圆柱体
@@ -111,7 +111,7 @@ export default class ThreePlus {
     // this.createTunnel() // 巷道
     // this.createPipe() // 管道
     // this.createTunnelComplete() // 完整巷道
-    // this.createExample() // 练习案例
+    // this.createExample(); // 练习案例
     // this.createFlyLine() // 创建飞线
     this.createBox(); // 盒子模型特效
   }

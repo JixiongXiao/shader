@@ -1,5 +1,6 @@
 import * as THREE from "three";
 import gsap from "gsap";
+import fragment from "./shader/box/boxfragment.glsl";
 import fragment1 from "./shader/box/boxfragment1.glsl";
 import fragment2 from "./shader/box/boxfragment2.glsl";
 import fragment3 from "./shader/box/boxfragment3.glsl";
@@ -9,7 +10,7 @@ import vertex from "./shader/box/vertex.glsl";
 // 水波纹平面
 export default class BoxEffect {
   constructor(time) {
-    this.geometry = new THREE.BoxGeometry(3, 3, 3, 100, 100, 100);
+    this.geometry = new THREE.BoxGeometry(3, 3, 3, 50, 50, 50);
     this.shaderMaterial = new THREE.ShaderMaterial({
       transparent: true,
       side: THREE.DoubleSide,
@@ -23,7 +24,8 @@ export default class BoxEffect {
         },
       },
       vertexShader: vertex,
-      fragmentShader: fragment1, // 动态线条
+      fragmentShader: fragment, // 常规
+      // fragmentShader: fragment1, // 动态线条
       // fragmentShader: fragment2, // 动态波纹
       // fragmentShader: fragment3, // 流动光面
     });
