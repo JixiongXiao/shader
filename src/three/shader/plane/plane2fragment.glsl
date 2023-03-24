@@ -3,7 +3,19 @@ varying vec3 vPosition;
 
 void main()
 {
-    vec2 center = vec2(0,0);
-    float strength = mod(vUv.y * 2.0, 1.0);
-	gl_FragColor = vec4(strength,strength, strength, 1.0); // 圆圈向外扩散，无其他特效，
+    float a = 1.0;
+    float t = 4.0; // 非虚化区域
+    float s = 1.0; // 虚化区域
+    if(vPosition.x > t || vPosition.x < -t) {
+    a *= s - (abs(vPosition.x) - t) / s;
+    if( vPosition.z > t || vPosition.z < -t) {
+    a *= s - (abs(vPosition.z) - t) / s;
+    }
+    }else if( vPosition.z > t || vPosition.z < -t) {
+    a *= s - (abs(vPosition.z) - t) / s;
+    if(vPosition.x > t || vPosition.x < -t){
+        a *= s - (abs(vPosition.x) - t) / s;
+    }
+    }
+	gl_FragColor = vec4(0.0,0.5,0.9, a); 
 }
