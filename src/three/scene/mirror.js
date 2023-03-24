@@ -257,8 +257,8 @@ export default class ThreePlus {
       this.scene.add(this.lion);
       this.models.push(this.lion);
     });
-    // this.createMirror1();
-    this.createMirror2();
+    this.createMirror1();
+    // this.createMirror2();
   }
   createMirror1() {
     const geometry = new THREE.PlaneGeometry(10, 10, 512, 512);

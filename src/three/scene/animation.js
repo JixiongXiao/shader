@@ -321,6 +321,7 @@ export default class ThreePlus {
     this.action.clampWhenFinished = true;
     this.action.repetitions = 1; // 只执行一次
     this.action.timeScale = 1; // 设定速度
+    console.log(this.capsule);
     this.action.play();
   }
   adjustDirection(index) {

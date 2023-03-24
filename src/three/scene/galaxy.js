@@ -288,7 +288,7 @@ export default class ThreePlus {
     // parameters.spin = 1;
     // parameters.uSize = 30; // 粒子大小
 
-    parameters.uSpeed = 10; // 旋转速度
+    parameters.uSpeed = 1; // 旋转速度
     parameters.randomnessPower = 3;
     parameters.insideColor = "#ff6030";
     parameters.outsideColor = "#1b3984";
