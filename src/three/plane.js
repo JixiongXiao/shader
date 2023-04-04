@@ -18,7 +18,7 @@ export default class Plane {
     const texture = textureLoader.load("./textures/texture.png");
     const bg = textureLoader.load("./textures/bg1.png");
     this.timer = null;
-    this.geometry = new THREE.PlaneGeometry(10, 10, 126, 126);
+    this.geometry = new THREE.PlaneGeometry(20, 20, 126, 126);
     this.geometry.applyMatrix4(new THREE.Matrix4().makeRotationX(-Math.PI / 2));
     this.shaderMaterial = new THREE.ShaderMaterial({
       // wireframe:true,

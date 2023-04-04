@@ -19,7 +19,8 @@ import {
   DepthDownsamplingPass,
   TextureEffect,
 } from "postprocessing";
-
+import { Water } from "three/examples/jsm/objects/Water";
+// import { Water } from "three/examples/jsm/objects/Water2";
 import MeshReflectorMaterial from "../material/MeshReflectorMaterial";
 import ReflectorMesh from "../material/ReflectorMesh";
 
@@ -208,6 +209,9 @@ export default class ThreePlus {
     if (this.mirrorPlane) {
       this.mirrorPlane.material.update();
     }
+    if (this.water1) {
+      this.water1.material.uniforms["time"].value += 1.0 / 160.0;
+    }
     this.raycaster.setFromCamera(this.mouse, this.camera);
   }
   taskQueue() {
@@ -257,8 +261,9 @@ export default class ThreePlus {
       this.scene.add(this.lion);
       this.models.push(this.lion);
     });
-    this.createMirror1();
+    // this.createMirror1();
     // this.createMirror2();
+    this.creatWater1();
   }
   createMirror1() {
     const geometry = new THREE.PlaneGeometry(10, 10, 512, 512);
@@ -328,6 +333,24 @@ export default class ThreePlus {
       metalness: 0.1,
     });
     this.mirrorPlane = plane;
+  }
+  creatWater1() {
+    const textureLoader = new THREE.TextureLoader();
+    const normal = textureLoader.load("./textures/water_normal.jpg");
+    normal.wrapS = normal.wrapT = THREE.RepeatWrapping;
+    const geometry = new THREE.PlaneGeometry(10, 10, 512, 512);
+    this.water1 = new Water(geometry, {
+      textureWidth: 128,
+      textureHeight: 128,
+      waterNormals: normal,
+      sunDirection: new THREE.Vector3(),
+      sunColor: 0xffffff,
+      waterColor: 0x001e0f,
+      distortionScale: 0.8,
+      size: 0.1,
+    });
+    this.water1.rotation.x = -Math.PI / 2;
+    this.scene.add(this.water1);
   }
   testSsaoEffect() {
     const planeGeometry = new THREE.PlaneGeometry(50, 50);
