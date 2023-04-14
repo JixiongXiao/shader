@@ -498,7 +498,7 @@ export default class ThreePlus {
     pathPointList.set(points, 0.5, 10, up, false);
     const geometry = new PathGeometry();
     geometry.update(pathPointList, {
-      width: 0.3,
+      width: 0.5,
       arrow: false,
       side: "both",
     });
@@ -515,18 +515,14 @@ export default class ThreePlus {
       uniform float uelapseTime;
       varying vec2 vUv;
       void main() {
-          vec3 c;
+          vec3 c = vec3 (0.9,0.4,0.5);
           float a = 1.0;
-          if(vUv.x <= modelPosition){
-            a = 1.0;
-            c = vec3 (0.9,0.4,0.5);
-          } else {
-            a = 0.0;
-          }
+          float p = 30.0; //线段段数
+          a = step (vUv.x, modelPosition);
           if(abs(0.5 - vUv.y) >= 0.3){
-             c = uColor;
-             a = step(0.5, mod(vUv.x * 1.0 - uelapseTime, 1.0));
-            //  a = mod(vUv.x - uelapseTime, 1.0);
+            c = uColor;
+            float r = step(0.4, mod(vUv.x * p - uelapseTime, 1.0));
+            a = r;
           }
           gl_FragColor = vec4(c.xyz,a);
       }
