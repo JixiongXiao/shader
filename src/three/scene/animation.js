@@ -519,9 +519,9 @@ export default class ThreePlus {
           float a = 1.0;
           float p = 30.0; //线段段数
           a = step (vUv.x, modelPosition);
-          if(abs(0.5 - vUv.y) >= 0.3){
+          if(abs(0.5 - vUv.y) >= 0.4){
             c = uColor;
-            float r = step(0.4, mod(vUv.x * p - uelapseTime, 1.0));
+            float r = step(0.5, mod(vUv.x * p - uelapseTime, 1.0));
             a = r;
           }
           gl_FragColor = vec4(c.xyz,a);
