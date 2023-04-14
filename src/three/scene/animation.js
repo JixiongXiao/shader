@@ -10,6 +10,8 @@ import { Capsule } from "three/examples/jsm/math/Capsule.js";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import tunnelShader from "../shader/animation/tunnelShader.glsl";
 import { MeshLine, MeshLineMaterial, MeshLineRaycast } from "three.meshline";
+import { PathPointList } from "../material/PathPointList";
+import { PathGeometry } from "../material/PathGeometry";
 
 export default class ThreePlus {
   constructor(selector) {
@@ -41,10 +43,13 @@ export default class ThreePlus {
     this.actionObj = {
       isRun: false,
     };
+    this.modelPosition = {
+      value: 0,
+    };
     this.init();
   }
 
-  init() {
+  init () {
     this.initScene();
     this.initCamera();
     this.initRenderer();
@@ -56,15 +61,15 @@ export default class ThreePlus {
     this.taskQueue();
     this.render();
   }
-  initScene() {
+  initScene () {
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0x88ccee);
   }
-  initLayers() {
+  initLayers () {
     this.bloomLayer = new THREE.Layers();
     this.bloomLayer.set(1);
   }
-  initCamera() {
+  initCamera () {
     // 2创建相机
     this.camera = new THREE.PerspectiveCamera(
       45,
@@ -76,7 +81,7 @@ export default class ThreePlus {
     this.camera.position.set(-5.5, 3.7, 7.5);
     this.camera.updateProjectionMatrix();
   }
-  initRenderer() {
+  initRenderer () {
     // 初始化渲染器
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
     // 设置渲染尺寸的大小
@@ -85,7 +90,7 @@ export default class ThreePlus {
     this.renderer.shadowMap.enabled = true;
     this.domElement.appendChild(this.renderer.domElement);
   }
-  initControl() {
+  initControl () {
     // // 创建轨道控制器
     this.control = new OrbitControls(this.camera, this.renderer.domElement);
     // 第一人称控制器
@@ -93,17 +98,17 @@ export default class ThreePlus {
     // // 设置控制器阻尼,必须在动画循环里调用update
     this.control.enableDamping = true;
   }
-  initStat() {
+  initStat () {
     this.stats = new Stats();
     this.stats.domElement.style.position = "absolute";
     this.stats.domElement.style.top = "0px";
     this.domElement.appendChild(this.stats.domElement);
   }
-  initAxesHelper() {
+  initAxesHelper () {
     this.axesHelper = new THREE.AxesHelper(5);
     this.scene.add(this.axesHelper);
   }
-  initLight() {
+  initLight () {
     this.ambientLight = new THREE.AmbientLight(0x222222, 0.5);
     // this.scene.add(this.ambientLight)
     this.pointLight = new THREE.PointLight(0xffffff, 0.5);
@@ -113,7 +118,7 @@ export default class ThreePlus {
     const pointLightHelper = new THREE.PointLightHelper(this.pointLight);
     this.scene.add(pointLightHelper);
   }
-  render(time) {
+  render (time) {
     TWEEN.update(time);
     requestAnimationFrame(this.render.bind(this));
     let deltaTime = this.clock.getDelta(); // 刷新帧数
@@ -121,6 +126,7 @@ export default class ThreePlus {
     this.control && this.control.update();
     if (this.mixer) {
       this.mixer.update(deltaTime);
+      this.modelPosition.value = this.action.time / 100;
       // if(this.action.isRunning()){
       // 运动时动态修改模型方向
       //     this.adjustDirection(Math.floor(this.action.time))
@@ -137,12 +143,12 @@ export default class ThreePlus {
     this.stats.update();
     this.renderer.render(this.scene, this.camera);
   }
-  taskQueue() {
+  taskQueue () {
     this.createEnv();
     this.addListenser(); // 监听事件
     this.initRaycasterEvent();
   }
-  createEnv() {
+  createEnv () {
     const gltfLoader = new GLTFLoader();
     gltfLoader.load("./model/terrain.glb", (gltf) => {
       const planeMaterial = new THREE.MeshStandardMaterial({
@@ -190,11 +196,10 @@ export default class ThreePlus {
     this.capsule.add(capsuleBody);
 
     this.camera.position.set(0, 5, -7);
-    // this.camera.lookAt(this.capsule.position)
-    // this.control.target = this.capsule.position
     this.scene.add(this.capsule);
+
   }
-  keyBoardEvent(code) {
+  keyBoardEvent (code) {
     if (code === "Space") {
       this.action.paused = !this.action.paused;
     }
@@ -218,9 +223,18 @@ export default class ThreePlus {
         this.action.timeScale -= 1;
       }
     }
+    if (code === 'KeyR') {
+      // 测试通过矩阵旋转模型
+      let mtx = new THREE.Matrix4();
+      let position = new THREE.Vector3(5, 6, 5)
+      let target = new THREE.Vector3(3, 2.85, 3)
+      mtx.lookAt(position, target, this.capsule.up);
+      let toRotate = new THREE.Quaternion().setFromRotationMatrix(mtx);
+      this.capsule.applyQuaternion(toRotate)
+    }
   }
-  addListenser() {
-    window.addEventListener("keydown", (event) => {}, false);
+  addListenser () {
+    window.addEventListener("keydown", (event) => { }, false);
     window.addEventListener(
       "keyup",
       (event) => {
@@ -234,14 +248,14 @@ export default class ThreePlus {
     //     this.capsuleBodyControl.rotation.x += event.movementY * 0.003;
     // },false)
   }
-  createRaycaster(point) {
+  createRaycaster (point) {
     let start = new THREE.Vector3(point.x, 20, point.z);
     let direction = new THREE.Vector3(0, -1, 0);
     this.raycaster.set(start, direction);
     this.intersects = this.raycaster.intersectObject(this.plane);
     return this.intersects[0].point;
   }
-  initRaycasterEvent() {
+  initRaycasterEvent () {
     window.addEventListener("mousemove", (e) => {
       this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
       this.mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
@@ -250,7 +264,7 @@ export default class ThreePlus {
       this.terrainTest();
     });
   }
-  terrainTest() {
+  terrainTest () {
     const location = [
       new THREE.Vector3(0, 5, 0),
       new THREE.Vector3(13, 5, 5),
@@ -263,7 +277,7 @@ export default class ThreePlus {
     // curve.curveType = 'centripetal';
     curve.curveType = "catmullrom";
     curve.tension = 0.2; //catmullrom 类型的张力
-    const points = curve.getPoints(99);
+    const points = curve.getSpacedPoints(99);
     const curvePoints = []; // 有高度的曲线点集合
     points.forEach((point) => {
       let newPoint = this.createRaycaster(point);
@@ -276,19 +290,20 @@ export default class ThreePlus {
     });
     const geometry = new THREE.BufferGeometry().setFromPoints(curvePoints);
     const geometry2 = new THREE.BufferGeometry().setFromPoints(location);
-    const line = new THREE.Line(geometry, material);
-    const line2 = new THREE.Line(geometry2, material);
-    this.scene.add(line2);
-    this.scene.add(line);
+    // const line = new THREE.Line(geometry, material);
+    // const line2 = new THREE.Line(geometry2, material);
+    // this.scene.add(line2);
+    // this.scene.add(line);
     this.actionObj.points = curvePoints;
     this.actionObj.curve = curveWithHeight; //曲线
 
     this.animationMoving(curvePoints);
     // this.createMeshLine() //用meshLine生成的路径
-    this.pathAnimate(); //tube生成的路径
+    // this.pathAnimate(); //tube生成的路径
+    this.createPath(curvePoints) // 用fatLine生成
   }
   // 动画方式移动模型
-  animationMoving(points) {
+  animationMoving (points) {
     // 动画
     let posArr = [];
     let timeArr = [];
@@ -320,11 +335,10 @@ export default class ThreePlus {
     this.action = this.mixer.clipAction(clip);
     this.action.clampWhenFinished = true;
     this.action.repetitions = 1; // 只执行一次
-    this.action.timeScale = 1; // 设定速度
-    console.log(this.capsule);
+    this.action.timeScale = 10; // 设定速度
     this.action.play();
   }
-  adjustDirection(index) {
+  adjustDirection (index) {
     if (this.index && this.index === index) {
       return;
     } else {
@@ -353,16 +367,16 @@ export default class ThreePlus {
     }
   }
   // 计算旋转四元数
-  culculateQuaternion() {
+  culculateQuaternion () {
     const quaternionArr = [];
     for (let i = 0; i < 100; i++) {
       const position = this.actionObj.curve.getPointAt((i + 1) / 100);
       // 切线
       const tangent = this.actionObj.curve.getTangentAt((i + 1) / 100);
       const target = tangent.add(position);
-      let offsetAngle = 0;
       let mtx = new THREE.Matrix4();
       mtx.lookAt(position, target, this.capsule.up);
+      let offsetAngle = 0; //看角度是否需要偏移
       mtx.multiply(
         new THREE.Matrix4().makeRotationFromEuler(
           new THREE.Euler(0, offsetAngle, 0)
@@ -378,7 +392,7 @@ export default class ThreePlus {
     return new Float32Array(quaternionRawArr);
   }
   // 路径动画
-  pathAnimate() {
+  pathAnimate () {
     const texture = new THREE.TextureLoader().load(
       "./textures/spriteline3.png"
     );
@@ -441,7 +455,8 @@ export default class ThreePlus {
     mesh.position.y = mesh.position.y - 0.9;
     this.scene.add(mesh);
   }
-  createMeshLine() {
+  // 用meshLine做路径
+  createMeshLine () {
     let posArr = [];
     for (let i = 0; i < 100; i++) {
       posArr.push(
@@ -453,7 +468,7 @@ export default class ThreePlus {
     let value = new Float32Array(posArr);
     this.makeLine(value);
   }
-  makeLine(geometry) {
+  makeLine (geometry) {
     const texture = new THREE.TextureLoader().load(
       "./textures/spriteline3.png"
     );
@@ -474,6 +489,62 @@ export default class ThreePlus {
     });
     const mesh = new THREE.Mesh(g, material);
     mesh.position.y = mesh.position.y - 0.6;
+    this.scene.add(mesh);
+  }
+  // 用fatLine做路径
+  createPath (points) {
+    const up = new THREE.Vector3(0, 1, 0);
+    const pathPointList = new PathPointList();
+    pathPointList.set(points, 0.5, 10, up, false);
+    const geometry = new PathGeometry();
+    geometry.update(pathPointList, {
+      width: 0.3,
+      arrow: false,
+      side: "both",
+    });
+    const vertexShader = `
+       varying vec2 vUv;
+       void main() {
+          vUv = uv;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+       }
+    `;
+    const fragmentShader = `
+      uniform vec3 uColor;
+      uniform float modelPosition;
+      uniform float uelapseTime;
+      varying vec2 vUv;
+      void main() {
+          vec3 c;
+          float a = 1.0;
+          if(vUv.x <= modelPosition){
+            a = 1.0;
+            c = vec3 (0.9,0.4,0.5);
+          } else {
+            a = 0.0;
+          }
+          if(abs(0.5 - vUv.y) >= 0.3){
+             c = uColor;
+             a = step(0.5, mod(vUv.x * 1.0 - uelapseTime, 1.0));
+            //  a = mod(vUv.x - uelapseTime, 1.0);
+          }
+          gl_FragColor = vec4(c.xyz,a);
+      }
+    `;
+    var material = new THREE.ShaderMaterial({
+      vertexShader: vertexShader,
+      fragmentShader: fragmentShader,
+      transparent: true,
+      side: THREE.DoubleSide,
+      uniforms: {
+        uelapseTime: this.elapsedTime,
+        modelPosition: this.modelPosition,
+        uColor: {
+          value: new THREE.Color('#27A1D1')
+        }
+      }
+    });
+    const mesh = new THREE.Mesh(geometry, material);
     this.scene.add(mesh);
   }
 }

@@ -1,6 +1,18 @@
 varying vec2 vUv;
 varying vec3 vPosition;
 
+// void main()
+// {
+//     float a = 0.0;
+//     float t = 9.0; 
+//     if(vPosition.x > t || vPosition.x < -t){
+//         a  = 1.0;
+//     }
+//     if(vPosition.z > t || vPosition.z < -t){
+//         a = 1.0;
+//     }
+// 	gl_FragColor = vec4(0.0,0.5,0.9, a); 
+// }
 void main()
 {
     float a = 1.0;

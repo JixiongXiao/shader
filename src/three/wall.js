@@ -31,9 +31,9 @@ export default class Wall {
       },
       vertexShader: vertex,
       // fragmentShader:helicalWallFragment // 螺旋上升墙壁特效
-      // fragmentShader:lineWallFragment // 方块上升墙壁特效
-      // fragmentShader:fadeWallFragment // 渐弱墙壁特效
-      fragmentShader: rotateWallFragment, // 旋转特效
+      fragmentShader: lineWallFragment // 方块上升墙壁特效
+      // fragmentShader: fadeWallFragment // 渐弱墙壁特效
+      // fragmentShader: rotateWallFragment, // 旋转特效
     });
     this.mesh = new THREE.Mesh(this.geometry, this.shaderMaterial);
     this.mesh.geometry.computeBoundingBox();
@@ -49,7 +49,7 @@ export default class Wall {
       ease: "linear",
     });
   }
-  updateTime(time) {
+  updateTime (time) {
     this.shaderMaterial.uniforms.uelapseTime.value = time;
   }
 }

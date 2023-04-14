@@ -4,7 +4,7 @@ import gsap from "gsap";
 import vertex from "./shader/plane/vertex.glsl";
 
 import plane1fragment from "./shader/plane/plane1fragment.glsl"; // 圆圈向外扩散特效
-import plane2fragment from "./shader/plane/plane2fragment.glsl"; // 测试专用
+import plane2fragment from "./shader/plane/plane2fragment.glsl"; // 正方形边缘虚化
 import plane3fragment from "./shader/plane/plane3fragment.glsl"; // 正方形转八边形动态
 import plane4fragment from "./shader/plane/plane4fragment.glsl"; // 正方形转八边形动态
 import plane5fragment from "./shader/plane/plane5fragment.glsl"; // 动态波动图形
@@ -67,7 +67,7 @@ export default class Plane {
     });
     this.mesh = new THREE.Mesh(this.geometry, this.shaderMaterial);
   }
-  updateTime(time) {
+  updateTime (time) {
     this.shaderMaterial.uniforms.uelapseTime.value = time;
   }
 }

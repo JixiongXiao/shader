@@ -126,7 +126,6 @@ class PathGeometry extends THREE.BufferGeometry {
       options,
       generateUv2
     );
-
     if (vertexData) {
       this._updateAttributes(
         vertexData.position,
@@ -253,7 +252,9 @@ function generatePathVertexData(pathPointList, options, generateUv2 = false) {
     const first = position.length === 0;
     const sharpCorner = pathPoint.sharp && !first;
 
-    const uvDist = pathPoint.dist / sideWidth;
+    // const uvDist = pathPoint.dist / sideWidth; // origin
+    // 此处修改了uv绘制逻辑，uv从起点到终点为0-1
+    const uvDist = pathPoint.dist / totalDistance;
     const uvDist2 = pathPoint.dist / totalDistance;
 
     const dir = pathPoint.dir;
@@ -551,7 +552,6 @@ function generatePathVertexData(pathPointList, options, generateUv2 = false) {
           (progressDistance - prevPoint.dist) /
           (pathPoint.dist - prevPoint.dist);
         lastPoint.lerpPathPoints(prevPoint, pathPoint, alpha);
-
         addVertices(lastPoint);
         break;
       } else {

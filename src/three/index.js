@@ -29,7 +29,7 @@ export default class ThreePlus {
     this.init();
   }
 
-  init() {
+  init () {
     this.initScene();
     this.initCamera();
     this.initRenderer();
@@ -39,10 +39,10 @@ export default class ThreePlus {
     this.taskQueue();
     this.render();
   }
-  initScene() {
+  initScene () {
     this.scene = new THREE.Scene();
   }
-  initCamera() {
+  initCamera () {
     // 2创建相机
     this.camera = new THREE.PerspectiveCamera(
       75,
@@ -54,7 +54,7 @@ export default class ThreePlus {
     this.camera.position.set(10, 10, 10);
     this.camera.updateProjectionMatrix();
   }
-  initRenderer() {
+  initRenderer () {
     // 初始化渲染器
     this.renderer = new THREE.WebGLRenderer({
       antialias: true,
@@ -66,17 +66,17 @@ export default class ThreePlus {
     this.renderer.shadowMap.enabled = true;
     this.domElement.appendChild(this.renderer.domElement);
   }
-  initControl() {
+  initControl () {
     // 创建轨道控制器
     this.control = new OrbitControls(this.camera, this.renderer.domElement);
     // 设置控制器阻尼,必须在动画循环里调用update
     this.control.enableDamping = true;
   }
-  initAxesHelper() {
+  initAxesHelper () {
     this.axesHelper = new THREE.AxesHelper(5);
     this.scene.add(this.axesHelper);
   }
-  initLight() {
+  initLight () {
     this.ambientLight = new THREE.AmbientLight(0x222222, 4);
     this.pointLight = new THREE.PointLight(0xffffff);
     this.pointLight.position.set(0, 10, 0);
@@ -84,7 +84,7 @@ export default class ThreePlus {
     this.scene.add(this.ambientLight);
     this.scene.add(this.pointLight);
   }
-  initBackground() {
+  initBackground () {
     const rgbeLoader = new RGBELoader();
     rgbeLoader.load("./textures/powerplant.hdr", (tex) => {
       tex.mapping = THREE.EquirectangularReflectionMapping; // 环境模糊效果
@@ -93,22 +93,22 @@ export default class ThreePlus {
       // this.scene.backgroundBlurriness = 1;
     });
   }
-  render() {
+  render () {
     let deltaTime = this.clock.getDelta(); // 刷新帧数，返回一个固定数值
     this.elapsedTime.value = this.clock.getElapsedTime();
     this.control && this.control.update();
     requestAnimationFrame(this.render.bind(this));
     this.renderer.render(this.scene, this.camera);
   }
-  taskQueue() {
+  taskQueue () {
     this.initBackground();
     // this.createFlow();
     // this.createPoint()
     // this.createWater()
-    // this.createWall(); //墙面特效 4面圆柱体
+    this.createWall(); //墙面特效 4面圆柱体
     // this.createGrid() // 网格棋盘特效
     // this.createPlane(); // 平面底特效
-    this.createTunnel(); // 巷道
+    // this.createTunnel(); // 巷道
     // this.createPipe() // 管道
     // this.createTunnelComplete() // 完整巷道
     // this.createExample(); // 练习案例
@@ -116,19 +116,19 @@ export default class ThreePlus {
     // this.createBox(); // 盒子模型特效
   }
   // 创建网格平面
-  createGrid() {
+  createGrid () {
     this.gridPlane = new CusPlane(this.elapsedTime);
     // this.scene.add(this.plane.gridHelper)
     this.scene.add(this.gridPlane.mesh);
   }
   // 创建网格平面
-  createPlane() {
+  createPlane () {
     this.plane = new Plane(this.elapsedTime);
     // this.scene.add(this.plane.gridHelper)
     this.scene.add(this.plane.mesh);
   }
   // 创建管道
-  createPipe() {
+  createPipe () {
     const group = new THREE.Group();
     const arr1 = [new THREE.Vector3(-3, 0, 0), new THREE.Vector3(-3, 0, 5)];
     let pipe1 = new Pipe(arr1, 1);
@@ -151,7 +151,7 @@ export default class ThreePlus {
     this.scene.add(group);
   }
   // 创建巷道
-  createTunnel() {
+  createTunnel () {
     const group = new THREE.Group();
 
     const arr1 = [new THREE.Vector3(-3, 0, 0), new THREE.Vector3(-3, 0, 6)];
@@ -188,7 +188,7 @@ export default class ThreePlus {
     this.scene.add(group);
   }
   // 创建完整矿道模型
-  createTunnelComplete() {
+  createTunnelComplete () {
     // const vecEx = new THREE.Vector3(5,0,-5)
     // const vecXx = new THREE.Vector3(-20,0,-5)
     // console.log(vecXx.distanceTo(vecEx))
@@ -231,7 +231,7 @@ export default class ThreePlus {
     this.scene.add(group);
   }
   // 创建练习案例
-  createExample() {
+  createExample () {
     this.example1 = new Example(this.elapsedTime);
     this.scene.add(this.example1.mesh);
 
@@ -239,7 +239,7 @@ export default class ThreePlus {
     this.scene.add(this.example2.mesh);
   }
   // 创建飞线
-  createFlyLine() {
+  createFlyLine () {
     const arr = [
       new THREE.Vector3(0, 0, 0),
       new THREE.Vector3(2.5, 4, 2.5),
@@ -249,28 +249,28 @@ export default class ThreePlus {
     this.scene.add(this.flyLine1.mesh);
   }
   // 创建特效墙壁
-  createWall() {
+  createWall () {
     this.wall = new Wall(this.elapsedTime);
     this.scene.add(this.wall.mesh);
   }
   // 创建水面特效
-  createWater() {
+  createWater () {
     this.water = new Water(this.elapsedTime);
     this.scene.add(this.water.mesh);
   }
   // 创建点材质
-  createPoint() {
+  createPoint () {
     this.points = new Points(this.elapsedTime);
     this.scene.add(this.points.mesh);
   }
 
   // 水流特效
-  createFlow() {
+  createFlow () {
     this.waterFlow = new Flow(this.elapsedTime);
     this.scene.add(this.waterFlow.mesh);
   }
   // 盒子模型特效
-  createBox() {
+  createBox () {
     this.boxEffect = new BoxEffect(this.elapsedTime);
     this.scene.add(this.boxEffect.mesh);
   }

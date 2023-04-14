@@ -70,6 +70,7 @@ export default class ThreePlus {
       powerPreference: "high-performance",
     });
     // 设置渲染尺寸的大小
+    this.renderer.info.autoReset = false;
     this.renderer.setSize(this.width, this.height);
     // 开启阴影贴图
     this.renderer.shadowMap.enabled = true;
@@ -158,7 +159,7 @@ export default class ThreePlus {
   }
 
   render() {
-    requestAnimationFrame(this.render.bind(this));
+    this.renderer.info.reset();
     let deltaTime = this.clock.getDelta(); // 刷新帧数
     this.elapsedTime.value = this.clock.getElapsedTime();
     this.control && this.control.update();
@@ -167,11 +168,13 @@ export default class ThreePlus {
       this.mixer.update(deltaTime);
     }
     this.raycaster.setFromCamera(this.mouse, this.camera);
+    requestAnimationFrame(this.render.bind(this));
   }
   taskQueue() {
     // this.createPath();
     this.createPathWithMap();
-    this.initRaycasterEvent();
+    // this.addListenser();
+    // this.initRaycasterEvent();
   }
   createPath() {
     const points = [
@@ -201,7 +204,7 @@ export default class ThreePlus {
       (shader.uniforms.uelapseTime = this.elapsedTime),
         this.shaderModify(shader);
       // console.log(shader.vertexShader);
-      console.log(shader.fragmentShader);
+      // console.log(shader.fragmentShader);
     };
     this.scene.add(mesh);
   }
@@ -251,13 +254,13 @@ export default class ThreePlus {
       "./textures/spriteline2.png"
     );
     texture.wrapS = THREE.RepeatWrapping;
-    // texture.wrapT = THREE.RepeatWrapping;
-    texture.repeat.set(1, 1);
+    texture.wrapT = THREE.RepeatWrapping;
+    // texture.repeat.set(1, 1);
     const points = [
-      new THREE.Vector3(-2, 0, 5),
-      new THREE.Vector3(-2, 0, -5),
+      new THREE.Vector3(-2, 0, 3),
+      new THREE.Vector3(-2, 0, 2),
+      new THREE.Vector3(-2, 0, 1),
       new THREE.Vector3(2, 0, -5),
-      new THREE.Vector3(2, 0, 5),
     ];
     const up = new THREE.Vector3(0, 1, 0);
     const pathPointList = new PathPointList();
@@ -266,7 +269,7 @@ export default class ThreePlus {
     geometry.update(pathPointList, {
       width: 0.3,
       arrow: false,
-      side: "both",
+      // side: "both",
     });
     const material = new THREE.MeshStandardMaterial({
       color: 0xfffff,
@@ -280,9 +283,9 @@ export default class ThreePlus {
     mesh.material.onBeforeCompile = (shader) => {
       shader.uniforms.uTexture = { value: texture };
       shader.uniforms.tRepeat = { value: new THREE.Vector2(1, 1) };
-      (shader.uniforms.uelapseTime = this.elapsedTime),
-        this.shaderModifyWithMap(shader);
-      console.log(shader.fragmentShader);
+      shader.uniforms.uelapseTime = this.elapsedTime;
+      // this.shaderModifyWithMap(shader);
+      // console.log(shader.fragmentShader);
     };
     this.scene.add(mesh);
   }
@@ -326,15 +329,17 @@ export default class ThreePlus {
       `
       //#end
       float speed = 3.0;
-      vec2 horizontal = vec2(fract(vUv.x * tRepeat.x - uelapseTime * speed),vUv.y);
-      vec2 vertical = vec2(fract(vUv.y * tRepeat.y - uelapseTime * speed),vUv.x);
+      vec2 horizontal = vec2(fract(st.x * tRepeat.x - uelapseTime * speed),st.y);
+      vec2 vertical = vec2(fract(st.y * tRepeat.y - uelapseTime * speed),st.x);
       vec4 textureColor = texture2D(uTexture, horizontal);
       gl_FragColor = textureColor;
       `
     );
   }
   addListenser() {
-    window.addEventListener("dblclick", () => {});
+    window.addEventListener("dblclick", () => {
+      console.log(this.renderer.info);
+    });
     window.addEventListener("click", (e) => {
       this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
       this.mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
@@ -342,7 +347,7 @@ export default class ThreePlus {
       this.intersects = this.raycaster.intersectObjects(this.models);
       if (this.intersects.length > 0) {
         let obj = this.intersects[0].object;
-        console.log(obj);
+        // console.log(obj);
       }
     });
     window.addEventListener("mousedown", () => {

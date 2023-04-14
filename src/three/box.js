@@ -24,10 +24,10 @@ export default class BoxEffect {
         },
       },
       vertexShader: vertex,
-      fragmentShader: fragment, // 常规
+      // fragmentShader: fragment, // 常规
       // fragmentShader: fragment1, // 动态线条
       // fragmentShader: fragment2, // 动态波纹
-      // fragmentShader: fragment3, // 流动光面
+      fragmentShader: fragment3, // 流动光面
     });
     this.mesh = new THREE.Mesh(this.geometry, this.shaderMaterial);
     this.mesh.geometry.computeBoundingBox();
@@ -43,7 +43,7 @@ export default class BoxEffect {
       ease: "linear",
     });
   }
-  updateTime(time) {
+  updateTime (time) {
     this.shaderMaterial.uniforms.uelapseTime.value = time;
   }
 }
