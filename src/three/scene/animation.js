@@ -372,8 +372,13 @@ export default class ThreePlus {
     for (let i = 0; i < 100; i++) {
       const position = this.actionObj.curve.getPointAt((i + 1) / 100);
       // 切线
-      const tangent = this.actionObj.curve.getTangentAt((i + 1) / 100);
-      const target = tangent.add(position);
+      // const tangent = this.actionObj.curve.getTangentAt((i + 1) / 100);
+      // const target = tangent.add(position);
+      // 下一个点作为朝向
+      const index = i < 99 ? i + 1 : i;
+      console.log(index)
+      const target = this.actionObj.points[index]
+
       let mtx = new THREE.Matrix4();
       mtx.lookAt(position, target, this.capsule.up);
       let offsetAngle = 0; //看角度是否需要偏移
@@ -509,24 +514,50 @@ export default class ThreePlus {
           gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
        }
     `;
+    // 外层动态条纹
     const fragmentShader = `
       uniform vec3 uColor;
+      uniform vec3 rColor;
       uniform float modelPosition;
       uniform float uelapseTime;
       varying vec2 vUv;
       void main() {
-          vec3 c = vec3 (0.9,0.4,0.5);
+          vec3 c = rColor;
           float a = 1.0;
           float p = 30.0; //线段段数
           a = step (vUv.x, modelPosition);
+          // float d = modelPosition - vUv.x;
+          // if(d <= 0.05 && d >= 0.0) {
+          //   a -= 1.0 - (d * 10.0);
+          // }
           if(abs(0.5 - vUv.y) >= 0.4){
             c = uColor;
             float r = step(0.5, mod(vUv.x * p - uelapseTime, 1.0));
+            float fade = (mod(vUv.x * p - uelapseTime, 1.0) * 2.0) - 1.0;
             a = r;
           }
           gl_FragColor = vec4(c.xyz,a);
       }
     `;
+
+    // 单条纹
+    // const fragmentShader = `
+    //   uniform vec3 uColor;
+    //   uniform vec3 rColor;
+    //   uniform float modelPosition;
+    //   uniform float uelapseTime;
+    //   varying vec2 vUv;
+    //   void main() {
+
+    //     float a = 1.0;
+    //     float p = 30.0; //线段段数
+    //     a = step (vUv.x, modelPosition);
+    //     float r = step(0.5, mod(vUv.x * p - uelapseTime, 1.0));
+    //     float fade = (mod(vUv.x * p - uelapseTime, 1.0) * 2.0) - 1.0; // 线段尾部渐变
+    //     a+= r * fade;
+    //     gl_FragColor = vec4(rColor.xyz, a);
+    //   }
+    // `
     var material = new THREE.ShaderMaterial({
       vertexShader: vertexShader,
       fragmentShader: fragmentShader,
@@ -536,7 +567,10 @@ export default class ThreePlus {
         uelapseTime: this.elapsedTime,
         modelPosition: this.modelPosition,
         uColor: {
-          value: new THREE.Color('#27A1D1')
+          value: new THREE.Color('#19B89E')
+        },
+        rColor: {
+          value: new THREE.Color('#E5C015')
         }
       }
     });
