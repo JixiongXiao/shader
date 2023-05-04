@@ -223,6 +223,44 @@ export default class ThreePlus {
       const model = gltf.scene;
       this.scene.add(model);
     });
+    gltfLoader.load("./sci-hall/roomModel/ground03.glb", (gltf) => {
+      const model = gltf.scene;
+      this.scene.add(model);
+    });
+    gltfLoader.load("./sci-hall/roomModel/ground.glb", (gltf) => {
+      const model = gltf.scene;
+      this.scene.add(model);
+    });
+    gltfLoader.load("./sci-hall/roomModel/stage.glb", (gltf) => {
+      const model = gltf.scene;
+      this.scene.add(model);
+    });
+    gltfLoader.load("./sci-hall/roomModel/board.glb", (gltf) => {
+      const model = gltf.scene;
+      this.scene.add(model);
+    });
+    gltfLoader.load("./sci-hall/roomModel/stage02.glb", (gltf) => {
+      const model = gltf.scene;
+      this.scene.add(model);
+    });
+    gltfLoader.load("./sci-hall/roomModel/collisions.glb", (gltf) => {
+      const model = gltf.scene;
+      model.traverse((child) => {
+        if (child.isMesh) {
+          const shape = new CANNON.Box(
+            new CANNON.Vec3(child.scale.x, child.scale.y, child.scale.z)
+          );
+          const body = new CANNON.Body({
+            mass: 0,
+            material: physicsMaterial,
+          });
+          body.addShape(shape);
+          body.position.copy(child.position);
+          body.quaternion.copy(child.quaternion);
+          this.world.addBody(body);
+        }
+      });
+    });
     gltfLoader.load("./sci-hall/robot.glb", (gltf) => {
       this.robot = gltf.scene;
       this.robot.children[0].position.set(0, -0.8, 0);
