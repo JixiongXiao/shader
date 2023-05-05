@@ -175,7 +175,7 @@ export default class ThreePlus {
     this.createRain();
     this.initRaycasterEvent();
   }
-
+  //  https://www.wjceo.com/blog/threejs2/2019-02-28/185.html 方法源码
   createRain() {
     const num = 1000; // 雨水数量
     const rangeY = 500; // 高度
