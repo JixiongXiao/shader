@@ -20,7 +20,8 @@ import gui from "@/three/gui";
 // import ThreePlus from "@/three/scene/galaxy.js"; // 银河 星空
 // import ThreePlus from "@/three/scene/fatLine.js"; // 宽线
 // import ThreePlus from "@/three/scene/heatMap.js"; // 热力图
-import ThreePlus from "@/three/scene/wander.js"; // 漫游
+// import ThreePlus from "@/three/scene/wander.js"; // 漫游
+import ThreePlus from "@/three/scene/weather.js"; // 天气 下雨
 
 // 场景元素声明
 let screenDom = ref(null);
