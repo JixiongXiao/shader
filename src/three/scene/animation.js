@@ -49,7 +49,7 @@ export default class ThreePlus {
     this.init();
   }
 
-  init () {
+  init() {
     this.initScene();
     this.initCamera();
     this.initRenderer();
@@ -61,15 +61,15 @@ export default class ThreePlus {
     this.taskQueue();
     this.render();
   }
-  initScene () {
+  initScene() {
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0x88ccee);
   }
-  initLayers () {
+  initLayers() {
     this.bloomLayer = new THREE.Layers();
     this.bloomLayer.set(1);
   }
-  initCamera () {
+  initCamera() {
     // 2创建相机
     this.camera = new THREE.PerspectiveCamera(
       45,
@@ -81,7 +81,7 @@ export default class ThreePlus {
     this.camera.position.set(-5.5, 3.7, 7.5);
     this.camera.updateProjectionMatrix();
   }
-  initRenderer () {
+  initRenderer() {
     // 初始化渲染器
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
     // 设置渲染尺寸的大小
@@ -90,7 +90,7 @@ export default class ThreePlus {
     this.renderer.shadowMap.enabled = true;
     this.domElement.appendChild(this.renderer.domElement);
   }
-  initControl () {
+  initControl() {
     // // 创建轨道控制器
     this.control = new OrbitControls(this.camera, this.renderer.domElement);
     // 第一人称控制器
@@ -98,17 +98,17 @@ export default class ThreePlus {
     // // 设置控制器阻尼,必须在动画循环里调用update
     this.control.enableDamping = true;
   }
-  initStat () {
+  initStat() {
     this.stats = new Stats();
     this.stats.domElement.style.position = "absolute";
     this.stats.domElement.style.top = "0px";
     this.domElement.appendChild(this.stats.domElement);
   }
-  initAxesHelper () {
+  initAxesHelper() {
     this.axesHelper = new THREE.AxesHelper(5);
     this.scene.add(this.axesHelper);
   }
-  initLight () {
+  initLight() {
     this.ambientLight = new THREE.AmbientLight(0x222222, 0.5);
     // this.scene.add(this.ambientLight)
     this.pointLight = new THREE.PointLight(0xffffff, 0.5);
@@ -118,7 +118,7 @@ export default class ThreePlus {
     const pointLightHelper = new THREE.PointLightHelper(this.pointLight);
     this.scene.add(pointLightHelper);
   }
-  render (time) {
+  render(time) {
     TWEEN.update(time);
     requestAnimationFrame(this.render.bind(this));
     let deltaTime = this.clock.getDelta(); // 刷新帧数
@@ -143,12 +143,12 @@ export default class ThreePlus {
     this.stats.update();
     this.renderer.render(this.scene, this.camera);
   }
-  taskQueue () {
+  taskQueue() {
     this.createEnv();
     this.addListenser(); // 监听事件
     this.initRaycasterEvent();
   }
-  createEnv () {
+  createEnv() {
     const gltfLoader = new GLTFLoader();
     gltfLoader.load("./model/terrain.glb", (gltf) => {
       const planeMaterial = new THREE.MeshStandardMaterial({
@@ -197,9 +197,8 @@ export default class ThreePlus {
 
     this.camera.position.set(0, 5, -7);
     this.scene.add(this.capsule);
-
   }
-  keyBoardEvent (code) {
+  keyBoardEvent(code) {
     if (code === "Space") {
       this.action.paused = !this.action.paused;
     }
@@ -223,18 +222,18 @@ export default class ThreePlus {
         this.action.timeScale -= 1;
       }
     }
-    if (code === 'KeyR') {
+    if (code === "KeyR") {
       // 测试通过矩阵旋转模型
       let mtx = new THREE.Matrix4();
-      let position = new THREE.Vector3(5, 6, 5)
-      let target = new THREE.Vector3(3, 2.85, 3)
+      let position = new THREE.Vector3(5, 6, 5);
+      let target = new THREE.Vector3(3, 2.85, 3);
       mtx.lookAt(position, target, this.capsule.up);
       let toRotate = new THREE.Quaternion().setFromRotationMatrix(mtx);
-      this.capsule.applyQuaternion(toRotate)
+      this.capsule.applyQuaternion(toRotate);
     }
   }
-  addListenser () {
-    window.addEventListener("keydown", (event) => { }, false);
+  addListenser() {
+    window.addEventListener("keydown", (event) => {}, false);
     window.addEventListener(
       "keyup",
       (event) => {
@@ -248,14 +247,14 @@ export default class ThreePlus {
     //     this.capsuleBodyControl.rotation.x += event.movementY * 0.003;
     // },false)
   }
-  createRaycaster (point) {
+  createRaycaster(point) {
     let start = new THREE.Vector3(point.x, 20, point.z);
     let direction = new THREE.Vector3(0, -1, 0);
     this.raycaster.set(start, direction);
     this.intersects = this.raycaster.intersectObject(this.plane);
     return this.intersects[0].point;
   }
-  initRaycasterEvent () {
+  initRaycasterEvent() {
     window.addEventListener("mousemove", (e) => {
       this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
       this.mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
@@ -264,7 +263,7 @@ export default class ThreePlus {
       this.terrainTest();
     });
   }
-  terrainTest () {
+  terrainTest() {
     const location = [
       new THREE.Vector3(0, 5, 0),
       new THREE.Vector3(13, 5, 5),
@@ -300,10 +299,10 @@ export default class ThreePlus {
     this.animationMoving(curvePoints);
     // this.createMeshLine() //用meshLine生成的路径
     // this.pathAnimate(); //tube生成的路径
-    this.createPath(curvePoints) // 用fatLine生成
+    this.createPath(curvePoints); // 用fatLine生成
   }
   // 动画方式移动模型
-  animationMoving (points) {
+  animationMoving(points) {
     // 动画
     let posArr = [];
     let timeArr = [];
@@ -338,7 +337,7 @@ export default class ThreePlus {
     this.action.timeScale = 10; // 设定速度
     this.action.play();
   }
-  adjustDirection (index) {
+  adjustDirection(index) {
     if (this.index && this.index === index) {
       return;
     } else {
@@ -367,7 +366,7 @@ export default class ThreePlus {
     }
   }
   // 计算旋转四元数
-  culculateQuaternion () {
+  culculateQuaternion() {
     const quaternionArr = [];
     for (let i = 0; i < 100; i++) {
       const position = this.actionObj.curve.getPointAt((i + 1) / 100);
@@ -376,8 +375,8 @@ export default class ThreePlus {
       // const target = tangent.add(position);
       // 下一个点作为朝向
       const index = i < 99 ? i + 1 : i;
-      console.log(index)
-      const target = this.actionObj.points[index]
+      console.log(index);
+      const target = this.actionObj.points[index];
 
       let mtx = new THREE.Matrix4();
       mtx.lookAt(position, target, this.capsule.up);
@@ -397,7 +396,7 @@ export default class ThreePlus {
     return new Float32Array(quaternionRawArr);
   }
   // 路径动画
-  pathAnimate () {
+  pathAnimate() {
     const texture = new THREE.TextureLoader().load(
       "./textures/spriteline3.png"
     );
@@ -461,7 +460,7 @@ export default class ThreePlus {
     this.scene.add(mesh);
   }
   // 用meshLine做路径
-  createMeshLine () {
+  createMeshLine() {
     let posArr = [];
     for (let i = 0; i < 100; i++) {
       posArr.push(
@@ -473,7 +472,7 @@ export default class ThreePlus {
     let value = new Float32Array(posArr);
     this.makeLine(value);
   }
-  makeLine (geometry) {
+  makeLine(geometry) {
     const texture = new THREE.TextureLoader().load(
       "./textures/spriteline3.png"
     );
@@ -497,7 +496,7 @@ export default class ThreePlus {
     this.scene.add(mesh);
   }
   // 用fatLine做路径
-  createPath (points) {
+  createPath(points) {
     const up = new THREE.Vector3(0, 1, 0);
     const pathPointList = new PathPointList();
     pathPointList.set(points, 0.5, 10, up, false);
@@ -526,10 +525,6 @@ export default class ThreePlus {
           float a = 1.0;
           float p = 30.0; //线段段数
           a = step (vUv.x, modelPosition);
-          // float d = modelPosition - vUv.x;
-          // if(d <= 0.05 && d >= 0.0) {
-          //   a -= 1.0 - (d * 10.0);
-          // }
           if(abs(0.5 - vUv.y) >= 0.4){
             c = uColor;
             float r = step(0.5, mod(vUv.x * p - uelapseTime, 1.0));
@@ -567,12 +562,12 @@ export default class ThreePlus {
         uelapseTime: this.elapsedTime,
         modelPosition: this.modelPosition,
         uColor: {
-          value: new THREE.Color('#19B89E')
+          value: new THREE.Color("#19B89E"),
         },
         rColor: {
-          value: new THREE.Color('#E5C015')
-        }
-      }
+          value: new THREE.Color("#E5C015"),
+        },
+      },
     });
     const mesh = new THREE.Mesh(geometry, material);
     this.scene.add(mesh);

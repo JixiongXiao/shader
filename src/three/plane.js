@@ -10,8 +10,8 @@ import plane4fragment from "./shader/plane/plane4fragment.glsl"; // 正方形转
 import plane5fragment from "./shader/plane/plane5fragment.glsl"; // 动态波动图形
 import plane6fragment from "./shader/plane/plane6fragment.glsl"; // 动态波动图形
 import plane7fragment from "./shader/plane/plane7fragment.glsl"; // 动态波动图形
-import plane8fragment from "./shader/plane/plane7fragment.glsl"; // 正方形边框及圆形绘制函数
-import fragment from "./shader/plane/fragment.glsl" // 测试专用
+import plane8fragment from "./shader/plane/plane8fragment.glsl"; // 正方形边框及圆形绘制函数
+import fragment from "./shader/plane/fragment.glsl"; // 测试专用
 
 // 平面着色器特效
 export default class Plane {
@@ -65,11 +65,11 @@ export default class Plane {
         },
       },
       vertexShader: vertex,
-      fragmentShader: fragment,
+      fragmentShader: plane8fragment,
     });
     this.mesh = new THREE.Mesh(this.geometry, this.shaderMaterial);
   }
-  updateTime (time) {
+  updateTime(time) {
     this.shaderMaterial.uniforms.uelapseTime.value = time;
   }
 }

@@ -124,7 +124,9 @@ function generateTubeVertexData(pathPointList, options, generateUv2 = false) {
   const normalDir = new THREE.Vector3();
   function addVertices(pathPoint, radius, radialSegments) {
     const first = position.length === 0;
-    const uvDist = pathPoint.dist / circum;
+    // const uvDist = pathPoint.dist / circum;
+    // 此处修改了uv绘制逻辑，uv从起点到终点为0-1
+    const uvDist = pathPoint.dist / totalDistance;
     const uvDist2 = pathPoint.dist / totalDistance;
 
     for (let r = 0; r <= radialSegments; r++) {

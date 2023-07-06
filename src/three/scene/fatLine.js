@@ -13,6 +13,7 @@ import {
 } from "postprocessing";
 import { PathPointList } from "../material/PathPointList";
 import { PathGeometry } from "../material/PathGeometry";
+import { FlowLightSystem } from "../material/flowLight";
 
 export default class ThreePlus {
   constructor(selector) {
@@ -167,14 +168,16 @@ export default class ThreePlus {
     if (this.mixer) {
       this.mixer.update(deltaTime);
     }
+    this.flowSystem && this.flowSystem.update(this.elapsedTime.value);
     this.raycaster.setFromCamera(this.mouse, this.camera);
     requestAnimationFrame(this.render.bind(this));
   }
   taskQueue() {
     // this.createPath();
-    this.createPathWithMap();
+    // this.createPathWithMap();
     // this.addListenser();
     // this.initRaycasterEvent();
+    this.createFlowline();
   }
   createPath() {
     const points = [
@@ -257,10 +260,10 @@ export default class ThreePlus {
     texture.wrapT = THREE.RepeatWrapping;
     // texture.repeat.set(1, 1);
     const points = [
-      new THREE.Vector3(-2, 0, 3),
-      new THREE.Vector3(-2, 0, 2),
-      new THREE.Vector3(-2, 0, 1),
-      new THREE.Vector3(2, 0, -5),
+      new THREE.Vector3(-20, 0, 30),
+      new THREE.Vector3(-20, 0, 20),
+      new THREE.Vector3(-20, 0, 10),
+      new THREE.Vector3(20, 0, -50),
     ];
     const up = new THREE.Vector3(0, 1, 0);
     const pathPointList = new PathPointList();
@@ -284,7 +287,7 @@ export default class ThreePlus {
       shader.uniforms.uTexture = { value: texture };
       shader.uniforms.tRepeat = { value: new THREE.Vector2(1, 1) };
       shader.uniforms.uelapseTime = this.elapsedTime;
-      // this.shaderModifyWithMap(shader);
+      this.shaderModifyWithMap(shader);
       // console.log(shader.fragmentShader);
     };
     this.scene.add(mesh);
@@ -328,7 +331,7 @@ export default class ThreePlus {
       `//#end`,
       `
       //#end
-      float speed = 3.0;
+      float speed = 0.5;
       vec2 horizontal = vec2(fract(st.x * tRepeat.x - uelapseTime * speed),st.y);
       vec2 vertical = vec2(fract(st.y * tRepeat.y - uelapseTime * speed),st.x);
       vec4 textureColor = texture2D(uTexture, horizontal);
@@ -367,6 +370,23 @@ export default class ThreePlus {
           this.maxAngle = this._euler;
         }
       }
+    });
+  }
+  // 用类生成path
+  createFlowline() {
+    const points = [
+      new THREE.Vector3(-20, 0, 30),
+      new THREE.Vector3(-20, 0, 20),
+      new THREE.Vector3(-20, 0, 10),
+      new THREE.Vector3(20, 0, -50),
+    ];
+    this.flowSystem = new FlowLightSystem();
+    this.flowSystem.init(this.scene, this.bloomEffect);
+    this.flowSystem.createFlowLight(points, {
+      type: "line",
+      segments: 3.0,
+      width: 0.5,
+      bloom: true,
     });
   }
 }
