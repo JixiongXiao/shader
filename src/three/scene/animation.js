@@ -375,7 +375,6 @@ export default class ThreePlus {
       // const target = tangent.add(position);
       // 下一个点作为朝向
       const index = i < 99 ? i + 1 : i;
-      console.log(index);
       const target = this.actionObj.points[index];
 
       let mtx = new THREE.Matrix4();
@@ -502,7 +501,7 @@ export default class ThreePlus {
     pathPointList.set(points, 0.5, 10, up, false);
     const geometry = new PathGeometry();
     geometry.update(pathPointList, {
-      width: 0.5,
+      width: 1.5,
       arrow: false,
       side: "both",
     });
@@ -514,26 +513,26 @@ export default class ThreePlus {
        }
     `;
     // 外层动态条纹
-    const fragmentShader = `
-      uniform vec3 uColor;
-      uniform vec3 rColor;
-      uniform float modelPosition;
-      uniform float uelapseTime;
-      varying vec2 vUv;
-      void main() {
-          vec3 c = rColor;
-          float a = 1.0;
-          float p = 30.0; //线段段数
-          a = step (vUv.x, modelPosition);
-          if(abs(0.5 - vUv.y) >= 0.4){
-            c = uColor;
-            float r = step(0.5, mod(vUv.x * p - uelapseTime, 1.0));
-            float fade = (mod(vUv.x * p - uelapseTime, 1.0) * 2.0) - 1.0;
-            a = r;
-          }
-          gl_FragColor = vec4(c.xyz,a);
-      }
-    `;
+    // const fragmentShader = `
+    //   uniform vec3 uColor;
+    //   uniform vec3 rColor;
+    //   uniform float modelPosition;
+    //   uniform float uelapseTime;
+    //   varying vec2 vUv;
+    //   void main() {
+    //       vec3 c = rColor;
+    //       float a = 1.0;
+    //       float p = 30.0; //线段段数
+    //       a = step (vUv.x, modelPosition);
+    //       if(abs(0.5 - vUv.y) >= 0.4){
+    //         c = uColor;
+    //         float r = step(0.5, mod(vUv.x * p - uelapseTime, 1.0));
+    //         float fade = (mod(vUv.x * p - uelapseTime, 1.0) * 2.0) - 1.0;
+    //         a = r;
+    //       }
+    //       gl_FragColor = vec4(c.xyz,a);
+    //   }
+    // `;
 
     // 单条纹
     // const fragmentShader = `
@@ -553,6 +552,59 @@ export default class ThreePlus {
     //     gl_FragColor = vec4(rColor.xyz, a);
     //   }
     // `
+    // 外层动态条纹
+    const fragmentShader = `
+    #define PI 3.1415
+      uniform vec3 uColor;
+      uniform vec3 rColor;
+      uniform float modelPosition;
+      uniform float uelapseTime;
+      varying vec2 vUv;
+      void rotate2d(inout vec2 v, float a) {
+       mat2 m = mat2(cos(a), -sin(a), sin(a), cos(a));
+       v = m * v;
+      }
+
+ float arrow(vec2 av) {
+   float line1L = 0.5;
+    float line1 = length(av - vec2(clamp(av.x, -line1L, line1L), 0.));
+    line1 = smoothstep(0.06, 0.05, line1);
+    
+    vec2 rav = av;
+    rav.x -= line1L + 0.03;
+    rotate2d(rav, PI/1.54);
+    
+    float arrowL = 0.46;
+    float line2 = length(rav - vec2(clamp(rav.x, 0., arrowL), 0.));
+    line2 = smoothstep(0.06, 0.05, line2);
+
+    rotate2d(rav, -PI * 1.3 );
+    float line3 = length(rav - vec2(clamp(rav.x, 0., arrowL),0.));
+    line3 = smoothstep(0.06, 0.05, line3);
+    
+    return clamp(line1 + line2 + line3 , 0., 1.);
+}
+    
+
+      void main() {
+        float p = 20.0; //线段段数
+        vec2 st = (vUv * 2.0)-1.0;
+        float r = fract(st.x * p);
+        // float r = fract(st.x * p- uelapseTime);
+        vec2 vSt = vec2(r,st.y);
+        float a = arrow(vSt) ;
+        vec3 col;
+        vec3 cola = uColor;  //底色
+        vec3 colb = rColor;
+        col = mix(cola,colb,a);
+
+          if(abs(0.5 - vUv.y) >= 0.4){
+            float s = smoothstep(0.4, 0.5,abs(0.5 - vUv.y));
+            col = mix(cola,vec3(1.0,1.0,1.0),s);
+          }
+          gl_FragColor = vec4(col,1.0);
+      }
+    `;
     var material = new THREE.ShaderMaterial({
       vertexShader: vertexShader,
       fragmentShader: fragmentShader,
@@ -562,10 +614,10 @@ export default class ThreePlus {
         uelapseTime: this.elapsedTime,
         modelPosition: this.modelPosition,
         uColor: {
-          value: new THREE.Color("#19B89E"),
+          value: new THREE.Color("#EBE4BB"),
         },
         rColor: {
-          value: new THREE.Color("#E5C015"),
+          value: new THREE.Color("#CF4806"),
         },
       },
     });
