@@ -18,8 +18,8 @@ float circle(vec2 _st, float _radius){
 void main()
 {
     // vec3 color = vec3(0.0);
-    float color = box(vUv, vec2(0.9));
-    gl_FragColor = vec4(0.3,0.2,0.1, 1.0 - color);
-    // float color = circle(vUv, 0.9);
-    // gl_FragColor = vec4(0.3,0.2,0.1, color);
+    // float color = box(vUv, vec2(0.9));
+    // gl_FragColor = vec4(0.3,0.2,0.1, 1.0 - color);
+    float color = circle(vUv, 0.6);
+    gl_FragColor = vec4(0.3,0.2,0.1, color);
 }
