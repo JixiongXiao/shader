@@ -37,8 +37,9 @@
                             
                         float amplitude = 1.;
                         float frequency = 10.;
-                        
-                        float x = vUv.x;
+                        vec2 st = vec2(2.0*vUv.x,vUv.y);                      
+                        float x = 2.0 * st.x - pow(st.x,2.0);
+                        // float x = vUv.x;
 
                         float y = sin(x * frequency);
                         float t = 0.01*(-uelapseTime*130.0);
@@ -56,27 +57,9 @@
 
                         baseColor.a = step(vUv.y,y) * (y-vUv.y)/y;
 
-
-                        
                         vec2 base1 = lll(0.1);
                         vec2 base2 = lll(0.3);
                         vec2 base3 = lll(0.4);
-
-                        
-
-                        // if( ((vUv.x<base1.y && vUv.x>base1.x)||(vUv.x<base2.y && vUv.x>base2.x)) &&fract(vUv.y - uelapseTime)>0.3 ){
-
-                        //     float r = step(0.3, fract(vUv.y - uelapseTime));
-                        //     float fade = fract(vUv.y - uelapseTime);
-
-                        //     float  a =  r ;
-
-                        //     flowColor.a = a *  step(0.01,baseColor.a)  ;
-                        //     finalColor = flowColor;
-                        // }else{
-                        //     finalColor = baseColor;
-                        // }
-
                         gl_FragColor = baseColor;
 
                         }
