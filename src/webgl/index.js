@@ -1,7 +1,11 @@
+import Shape from "./main/shape";
+import GlslLearn from "./main/glslLearn";
+
 export default class ThreePlus {
   constructor(dom) {
     this.domElement = document.querySelector(dom);
     this.init();
+    this.run();
   }
   init() {
     this.canvas = document.createElement("canvas");
@@ -12,89 +16,43 @@ export default class ThreePlus {
     // 获取webgl上下文
     this.gl = this.canvas.getContext("webgl");
     // this.gl.enable(this.gl.CULL_FACE);
-    this.draw();
   }
-  draw() {
-    // 创建顶点着色器
-    const vShader = this.gl.createShader(this.gl.VERTEX_SHADER);
-    this.gl.shaderSource(
-      vShader,
-      /*glsl */ `
-    attribute vec4 v_position;
-    void main() {
-     gl_Position = v_position;
-     // 设置点的大小
-     gl_PointSize = 20.0;
-    }`
-    );
-    this.gl.compileShader(vShader);
-    // 创建片元着色器
-    const fShader = this.gl.createShader(this.gl.FRAGMENT_SHADER);
-    this.gl.shaderSource(
-      fShader,
-      `
-    void main() {
-     gl_FragColor = vec4(1.0,0.0,0.0,1.0);
-    }
-    `
-    );
-    this.gl.compileShader(fShader);
-
-    // 创建着色器程序, 并关联顶点，片元着色器
-    const program = this.gl.createProgram();
-    this.gl.attachShader(program, vShader);
-    this.gl.attachShader(program, fShader);
-    this.gl.linkProgram(program);
-
-    // 使用着色器
-    this.gl.useProgram(program);
-
-    // 创建顶点数据
-    const position = this.gl.getAttribLocation(program, "v_position");
-    // 创建缓冲区
-    const pBuffer = this.gl.createBuffer();
-    // 绑定缓冲区
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, pBuffer);
-    // 设置顶点数据
-    this.gl.bufferData(
-      this.gl.ARRAY_BUFFER,
-      new Float32Array([0.0, 0.5, 0.5, -0.5, -0.5, -0.5]),
-      this.gl.STATIC_DRAW
-    );
-
-    // 将顶点数据提供给position
-    this.gl.vertexAttribPointer(
-      position,
-      2, // 迭代数，数组中每2个单位为一组
-      this.gl.FLOAT,
-      false,
-      0, //
-      0 // 从第0个开始
-    );
-
-    // 开启attribute变量
-    this.gl.enableVertexAttribArray(position);
-
-    // 用element array方法绘制
-    // 创建索引缓冲数据
-    const indexBuffer = this.gl.createBuffer();
-    // 绑定缓冲数据
-    this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, indexBuffer);
-    // 设置索引
-    this.gl.bufferData(
-      this.gl.ELEMENT_ARRAY_BUFFER,
-      new Uint8Array([0, 1, 2, 5, 1, 2]),
-      this.gl.STATIC_DRAW
-    );
-    this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
-    //绘制
-    //绘制方法1
-    // this.gl.drawArrays(this.gl.TRIANGLES, 0, 6);
-    // 绘制方法2
-    // this.gl.drawElements(this.gl.POINTS, 3, this.gl.UNSIGNED_BYTE, 0);
-    // // 绘制方法3
-    // this.gl.drawElements(this.gl.LINES, 4, this.gl.UNSIGNED_BYTE, 0);
-    // // 绘制方法4
-    this.gl.drawElements(this.gl.TRIANGLES, 6, this.gl.UNSIGNED_BYTE, 0);
+  run() {
+    this.shape = new Shape(this.canvas, this.gl);
+    // this.drawLineEvent(); // 注册线段绘制事件
+    // this.drawRectEvent();
+    this.rect = new GlslLearn(this.canvas, this.gl);
+    this.rect.rectangle(-0.5, -0.5, 1 * 0.5, 1, [1, 0, 0, 1]);
+  }
+  drawLineEvent() {
+    window.addEventListener("click", (e) => {
+      let x = (e.clientX / window.innerWidth - 0.5) * 2;
+      let y = -(e.clientY / window.innerHeight - 0.5) * 2;
+      if (this.shape.vertices.length === 0) {
+        this.shape.moveTo(x, y);
+      } else {
+        this.shape.lineTo(x, y);
+      }
+    });
+  }
+  drawRectEvent() {
+    let point = 0;
+    let arr = [];
+    window.addEventListener("click", (e) => {
+      let x = (e.clientX / window.innerWidth - 0.5) * 2;
+      let y = -(e.clientY / window.innerHeight - 0.5) * 2;
+      point++;
+      arr.push([x, y]);
+      this.shape.drawPoint(x, y); // 绘制当前点击的点
+      if (point === 2) {
+        this.shape.drawPoint(arr[0][0], arr[0][1]); // 绘制第一个点
+        let width = arr[1][0] - arr[0][0];
+        let height = arr[1][1] - arr[0][1];
+        let color = [Math.random(), Math.random(), Math.random(), 1];
+        this.shape.rectangle(arr[0][0], arr[0][1], width, height, color);
+        arr = [];
+        point = 0;
+      }
+    });
   }
 }
