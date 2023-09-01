@@ -1,5 +1,6 @@
 import Shape from "./main/shape";
 import GlslLearn from "./main/glslLearn";
+import Box from "./main/box";
 
 export default class ThreePlus {
   constructor(dom) {
@@ -18,11 +19,13 @@ export default class ThreePlus {
     // this.gl.enable(this.gl.CULL_FACE);
   }
   run() {
-    this.shape = new Shape(this.canvas, this.gl);
+    // this.shape = new Shape(this.canvas, this.gl);
     // this.drawLineEvent(); // 注册线段绘制事件
     // this.drawRectEvent();
-    this.rect = new GlslLearn(this.canvas, this.gl);
-    this.rect.rectangle(-0.5, -0.5, 1 * 0.5, 1, [1, 0, 0, 1]);
+    // this.shape.rectangle(-0.25, -0.5, 1 * 0.5, 1, [1, 0, 0, 1]);
+    // this.rect = new GlslLearn(this.canvas, this.gl);
+    this.boxShape = new Box(this.canvas, this.gl);
+    this.boxShape.rectangle(-50, 50, 100, -100, [0.1, 0.2, 0.3, 1]);
   }
   drawLineEvent() {
     window.addEventListener("click", (e) => {

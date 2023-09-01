@@ -1,4 +1,4 @@
-export default class Shape {
+export default class Box {
   constructor(canvas, gl) {
     this.canvas = canvas;
     this.gl = gl;
@@ -16,13 +16,10 @@ export default class Shape {
     varying vec4 v_color;
     attribute vec4 a_color;
     uniform mat2 u_matrix;
+    uniform mat2 u_viewMatrix;
     void main() {
-      // 矩阵变换测试
-      vec2 pos = u_matrix * v_position.xy;
+      vec2 pos =u_viewMatrix * u_matrix * v_position.xy;
      gl_Position = vec4(pos,0,1);
-
-    // default 
-    //  gl_Position = v_position;
 
      v_color = a_color;
      // 设置点的大小
@@ -84,38 +81,21 @@ export default class Shape {
 
     // umatrix传值
     this.u_matrix = this.gl.getUniformLocation(this.program, "u_matrix");
-    this.gl.uniformMatrix2fv(this.u_matrix, false, [0.5, 0.5, 0.5, -0.5]);
-    // 设置顶点颜色
-    // this.aColor = this.gl.getAttribLocation(this.program, "a_color");
-    // this.cBuffer = this.gl.createBuffer();
-    // this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.cBuffer);
-    // this.gl.vertexAttribPointer(this.aColor, 4, this.gl.FLOAT, false, 0, 0);
-    // this.gl.enableVertexAttribArray(this.aColor);
+    this.gl.uniformMatrix2fv(this.u_matrix, false, [1, 0, 0, 1]);
 
-    // this.colors = [
-    //   0.0,
-    //   0.0,
-    //   0.0,
-    //   1.0, // 黑
-    //   1.0,
-    //   0.0,
-    //   0.0,
-    //   1.0, // 红
-    //   0.0,
-    //   1.0,
-    //   0.0,
-    //   1.0, // 绿
-    //   0.0,
-    //   0.0,
-    //   1.0,
-    //   1.0, // 蓝
-    // ];
-
-    // this.gl.bufferData(
-    //   this.gl.ARRAY_BUFFER,
-    //   new Float32Array(this.colors),
-    //   this.gl.STATIC_DRAW
-    // );
+    // viewMatrix传值
+    this.u_viewMatrix = this.gl.getUniformLocation(
+      this.program,
+      "u_viewMatrix"
+    );
+    let width = window.innerWidth / 2;
+    let heigth = window.innerHeight / 2;
+    this.gl.uniformMatrix2fv(this.u_viewMatrix, false, [
+      1 / width,
+      0,
+      0,
+      1 / heigth,
+    ]);
   }
   drawPoint(x, y) {
     this.vertices = [x, y];

@@ -28,7 +28,8 @@ export default class GlslLearn {
     // this.gl.shaderSource(this.fShader, this.fragmentShader("random")); // 随机函数
     // this.gl.shaderSource(this.fShader, this.fragmentShader("random1D")); // // 一维随机
     // this.gl.shaderSource(this.fShader, this.fragmentShader("random2D")); // // 二维随机
-    this.gl.shaderSource(this.fShader, this.fragmentShader("noise")); // // 二维随机
+    // this.gl.shaderSource(this.fShader, this.fragmentShader("noise")); // // 手写fbs噪声函数
+    this.gl.shaderSource(this.fShader, this.fragmentShader("noise1")); // // 噪声函数应用
 
     this.gl.compileShader(this.fShader);
   }
@@ -248,6 +249,73 @@ export default class GlslLearn {
       float z = noise(st * 10.0);
       float c = fbm(st * 15.0);
       z = c;
+
+     gl_FragColor = vec4(z,z,z,1.0);
+    }
+    `;
+    if (type === "noise1")
+      return /*glsl*/ `
+      precision mediump float;
+      #define r 43758.5453
+      uniform vec4 uColor;
+      varying vec4 vPosition;
+      float random(vec2 st){
+        return fract(sin(dot(st.xy,vec2(12.9898,78.233)))*r);
+      }
+      float noise(vec2 st) {
+      vec2 i = floor(st.xy);
+      vec2 f = fract(st.xy);
+      f = smoothstep(0.0,1.0,f);
+      float a = random(i);
+      float b = random(i + vec2(1.0,0.0));
+      float c = random(i + vec2(0.0,1.0));
+      float d = random(i + vec2(1.0,1.0));
+      float mixN = mix(a,b,f.x); // 相当于a * (1.0 - f.x) + b * f.x
+      float z = a * (1.0 - f.x) + b * f.x + (c - a) * f.y * (1.0 - f.x) + (d - b) * f.y * f.x;
+      return z;
+      }
+      float fbm(vec2 st) {
+        float value = 0.0;
+        float amplitude = 0.5;
+        float frequency = 2.0;
+        for(int i=0; i<6; i++) {
+          value += amplitude*noise(st);
+          st *= frequency;
+          amplitude *= 0.5;
+        }
+        return value;
+      }
+      float fbmAbs(vec2 st) {
+        float value = 0.0;
+        float amplitude = 0.5;
+        float frequency = 2.0;
+        for(int i=0; i<6; i++) {
+          value += amplitude*abs(sin(noise(st)*6.28));
+          st *= frequency;
+          amplitude *= 0.5;
+        }
+        return value;
+      }
+      float fbmRotate(vec2 st) {
+        float value = 0.0;
+        float amplitude = 0.5;
+        float frequency = 2.0;
+        vec2 shift = vec2(100.0);
+        mat2 rot = mat2(cos(0.5),sin(0.5),-sin(0.5),cos(0.5));
+        for(int i=0; i<6; i++) {
+          value += amplitude*noise(st);
+          st = rot * st * frequency + shift;
+          // st *= frequency;
+          amplitude *= 0.5;
+        }
+        return value;
+      }
+    void main() {
+      vec2 st = vPosition.xy;
+      // float z = fbmAbs(st * 15.0);
+      // float z = 1.0 - fbmAbs(st * 5.0); // 水纹效果
+      // float z = fbm(fbm(fbm(st * 15.0) + st * 15.0) + st * 15.0); // 多分型函数嵌套形成烟雾
+      float z = fbmRotate(st * 10.0); // 旋转分型噪声
 
      gl_FragColor = vec4(z,z,z,1.0);
     }
