@@ -148,7 +148,8 @@ export default class Shape {
     this.gl.drawArrays(this.gl.POINTS, 0, this.vertices.length / 2);
     this.gl.drawArrays(this.gl.LINE_STRIP, 0, this.vertices.length / 2);
   }
-  rectangle(x, y, width, height, color) {
+  rectangle(set) {
+    const { x, y, width, height, color } = set;
     this.vertices = [
       x,
       y,

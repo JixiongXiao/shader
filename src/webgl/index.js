@@ -5,6 +5,11 @@ import Box from "./main/box";
 export default class ThreePlus {
   constructor(dom) {
     this.domElement = document.querySelector(dom);
+    this.vector = { x: 0, y: 0 };
+    this.rotate = 0;
+    this.scale = 0.1;
+    this.count = 0;
+    this.judge = true;
     this.init();
     this.run();
   }
@@ -22,10 +27,10 @@ export default class ThreePlus {
     // this.shape = new Shape(this.canvas, this.gl);
     // this.drawLineEvent(); // 注册线段绘制事件
     // this.drawRectEvent();
-    // this.shape.rectangle(-0.25, -0.5, 1 * 0.5, 1, [1, 0, 0, 1]);
+    // this.shape.rectangle({x:-0.25, y:-0.5, width:1 * 0.5, height:1, color:[1, 0, 0, 1]});
     // this.rect = new GlslLearn(this.canvas, this.gl);
     this.boxShape = new Box(this.canvas, this.gl);
-    this.boxShape.rectangle(-50, 50, 100, -100, [0.1, 0.2, 0.3, 1]);
+    this.render();
   }
   drawLineEvent() {
     window.addEventListener("click", (e) => {
@@ -57,5 +62,29 @@ export default class ThreePlus {
         point = 0;
       }
     });
+  }
+  render() {
+    this.count += 0.16;
+    this.vector.x += 1;
+    this.vector.y += 1;
+    this.rotate += 0.05;
+    this.scale += 0.005;
+    if (this.vector.x > 500) {
+      this.vector.x = 0;
+      this.vector.y = 0;
+      this.scale = 0.1;
+    }
+    this.boxShape.rectangle({
+      x: -50,
+      y: 50,
+      width: 100,
+      height: -100,
+      color: [0.1, 0.2, 0.3, 1],
+      tx: this.vector.x,
+      ty: this.vector.y,
+      rotate: this.rotate,
+      scale: this.scale,
+    });
+    requestAnimationFrame(this.render.bind(this));
   }
 }

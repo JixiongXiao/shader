@@ -15,10 +15,16 @@ export default class Box {
     attribute vec4 v_position;
     varying vec4 v_color;
     attribute vec4 a_color;
-    uniform mat2 u_matrix;
+    uniform mat2 u_rotation;
     uniform mat2 u_viewMatrix;
+    uniform vec2 u_translation;
+    uniform mat2 u_scaleMatrix;
     void main() {
-      vec2 pos =u_viewMatrix * u_matrix * v_position.xy;
+     vec2 pos = v_position.xy; // 坐标
+     pos = u_rotation * pos; // 旋转矩阵转换
+     pos = u_scaleMatrix * pos; // 缩放矩阵
+     pos =  pos + u_translation; // 位移坐标
+     pos = u_viewMatrix  * pos; // 视图矩阵转换
      gl_Position = vec4(pos,0,1);
 
      v_color = a_color;
@@ -79,10 +85,6 @@ export default class Box {
     this.uColor = this.gl.getUniformLocation(this.program, "uColor");
     this.gl.uniform4f(this.uColor, 1.0, 1.0, 0.0, 1.0);
 
-    // umatrix传值
-    this.u_matrix = this.gl.getUniformLocation(this.program, "u_matrix");
-    this.gl.uniformMatrix2fv(this.u_matrix, false, [1, 0, 0, 1]);
-
     // viewMatrix传值
     this.u_viewMatrix = this.gl.getUniformLocation(
       this.program,
@@ -96,6 +98,13 @@ export default class Box {
       0,
       1 / heigth,
     ]);
+
+    // u_translation传值
+    this.u_translation = this.gl.getUniformLocation(
+      this.program,
+      "u_translation"
+    );
+    this.gl.uniform2f(this.u_translation, 0, 0); // 后两位为位移的像素距离
   }
   drawPoint(x, y) {
     this.vertices = [x, y];
@@ -128,7 +137,12 @@ export default class Box {
     this.gl.drawArrays(this.gl.POINTS, 0, this.vertices.length / 2);
     this.gl.drawArrays(this.gl.LINE_STRIP, 0, this.vertices.length / 2);
   }
-  rectangle(x, y, width, height, color) {
+  rectangle(set) {
+    const { x, y, width, height, color } = set;
+    let tx = set.tx || 0;
+    let ty = set.ty || 0;
+    let rotate = set.rotate || 0;
+    let scale = set.scale || 1;
     this.vertices = [
       x,
       y,
@@ -147,18 +161,33 @@ export default class Box {
       new Float32Array(this.vertices),
       this.gl.STATIC_DRAW
     );
+
+    // u_translation传值
+    this.u_translation = this.gl.getUniformLocation(
+      this.program,
+      "u_translation"
+    );
+    this.gl.uniform2f(this.u_translation, tx, ty); // 后两位为位移的像素距离
+
+    // umatrix传值
+    this.u_rotation = this.gl.getUniformLocation(this.program, "u_rotation");
+    this.gl.uniformMatrix2fv(this.u_rotation, false, [
+      Math.cos(rotate),
+      Math.sin(rotate),
+      -Math.sin(rotate),
+      Math.cos(rotate),
+    ]);
+
+    // uscale 传值
+    this.u_scaleMatrix = this.gl.getUniformLocation(
+      this.program,
+      "u_scaleMatrix"
+    );
+    this.gl.uniformMatrix2fv(this.u_scaleMatrix, false, [scale, 0, 0, scale]);
+
     // 创建索引数据
     this.indexBuffer = this.gl.createBuffer();
     this.gl.bindBuffer(this.gl.ELEMENT_ARRAY_BUFFER, this.indexBuffer);
-
-    //两个三角形绘制矩形
-    // this.gl.bufferData(
-    //   this.gl.ELEMENT_ARRAY_BUFFER,
-    //   new Uint8Array([0, 1, 3, 3, 1, 2]),
-    //   this.gl.STATIC_DRAW
-    // );
-    // // 绘制
-    // this.gl.drawElements(this.gl.TRIANGLES, 6, this.gl.UNSIGNED_BYTE, 0);
 
     // 一个三角带绘制矩形
     this.gl.bufferData(
