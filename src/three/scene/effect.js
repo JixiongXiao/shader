@@ -23,6 +23,7 @@ import { Water } from "three/examples/jsm/objects/Water";
 // import { Water } from "three/examples/jsm/objects/Water2";
 import MeshReflectorMaterial from "../material/MeshReflectorMaterial";
 import ReflectorMesh from "../material/ReflectorMesh";
+import { Reflector } from "../material/Reflector";
 
 export default class ThreePlus {
   constructor(selector) {
@@ -78,7 +79,7 @@ export default class ThreePlus {
     this.initRenderer();
     this.initLayers();
     this.initControl();
-    this.initAxesHelper();
+    // this.initAxesHelper();
     this.initComposer();
     this.initLight();
     this.taskQueue();
@@ -143,7 +144,7 @@ export default class ThreePlus {
     this.spotLight.castShadow = true;
     this.scene.add(this.spotLight);
     const spotLightHelper = new THREE.PointLightHelper(this.spotLight);
-    this.scene.add(spotLightHelper);
+    // this.scene.add(spotLightHelper);
   }
   initComposer() {
     this.composer = new EffectComposer(this.renderer);
@@ -216,16 +217,15 @@ export default class ThreePlus {
   }
   taskQueue() {
     this.initBackground();
-    this.addListenser();
+    // this.addListenser();
     // this.createMesh(); // outline和bloom效果
     this.loadModel(); // 镜面
-    // this.testSsaoEffect(); // 测试ssao 空间环境光遮蔽
   }
   initBackground() {
     const rgbeLoader = new RGBELoader();
     rgbeLoader.load("./textures/powerplant.hdr", (tex) => {
       tex.mapping = THREE.EquirectangularReflectionMapping; // 环境模糊效果
-      this.scene.background = tex;
+      // this.scene.background = tex;
       this.scene.environment = tex;
       this.scene.backgroundBlurriness = 1;
     });
@@ -258,18 +258,81 @@ export default class ThreePlus {
     });
     gltfLoader.load("./model/lion.gltf", (gltf) => {
       this.lion = gltf.scene.children[0];
+      this.shaderModify(this.lion);
       this.scene.add(this.lion);
       this.models.push(this.lion);
     });
-    this.createMirror1();
+    const boxGeometry = new THREE.SphereGeometry(1, 64, 64);
+    this.fMaterial = new THREE.ShaderMaterial({
+      transparent: true,
+      uniforms: {},
+      vertexShader: this.vertexShader(),
+      fragmentShader: this.fragmentShader(),
+    });
+    const mesh = new THREE.Mesh(boxGeometry, this.fMaterial);
+    mesh.position.set(0, 5, 3);
+    this.scene.add(mesh);
+    // this.createMirror1();
     // this.createMirror2();
     // this.creatWater1();
+  }
+  vertexShader() {
+    return /* glsl */ `
+    varying vec2 vUv;
+    varying vec3 vNormal;
+    varying vec4 mPosition;
+    varying vec4 mvPosition;
+    varying vec4 vPosition;
+    void main() {
+        vUv = uv;
+        vNormal = normal;
+        mPosition = modelMatrix * vec4( position, 1.0 );
+        mvPosition = viewMatrix * mPosition;
+        vPosition = projectionMatrix * mvPosition;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+    }
+  `;
+  }
+  fragmentShader() {
+    return /* glsl */ `
+    #define PI 3.14159265358
+    
+    varying vec2 vUv;
+    varying vec3 vNormal;
+    varying vec4 mPosition;
+    varying vec4 mvPosition;
+    varying vec4 vPosition;
+    void main(){
+     vec3 viewDir = normalize(cameraPosition - mPosition.xyz);
+     float intensity = 1.0 - dot(vNormal, viewDir);
+     // intensity = pow(intensity,5.0);
+    gl_FragColor = vec4(intensity,intensity,intensity,pow(intensity,1.5));
+    }
+   `;
+  }
+  shaderModify(mesh) {
+    mesh.material = this.fMaterial;
+    // mesh.material.onBeforeCompile = (shader) => {
+    //   shader.vertexShader.replace(
+    //     "#include <common>",
+
+    //     `
+    // varying vec2 vUv;
+    // varying vec3 vNormal;
+    // varying vec4 mPosition;
+    // varying vec4 mvPosition;
+    // varying vec4 vPosition;
+    // #include <common>
+    // `
+    //   );
+    //   console.log(shader.vertexShader);
+    // };
   }
   createMirror1() {
     const geometry = new THREE.PlaneGeometry(10, 10, 512, 512);
     const mirrorMaterial = new THREE.MeshStandardMaterial({
       transparent: true,
-      opacity: 0.5,
+      opacity: 1,
       roughness: 0.9,
       metalness: 0.6,
       // 可增加map
@@ -288,51 +351,14 @@ export default class ThreePlus {
   }
   createMirror2() {
     const geometry = new THREE.PlaneGeometry(10, 10, 512, 512);
-    const material = new THREE.MeshStandardMaterial({
-      color: 0xffffff,
-      roughness: 0.7,
-      metalness: 0.1,
+    const groundMirror = new Reflector(geometry, {
+      clipBias: 0.003,
+      textureHeight: window.innerHeight * window.devicePixelRatio,
+      textureWidth: window.innerWidth * window.devicePixelRatio,
+      color: 0xb5b5b5,
     });
-    const plane = new THREE.Mesh(geometry, material);
-    plane.rotateX(-Math.PI / 2);
-    this.scene.add(plane);
-    plane.material = new MeshReflectorMaterial(
-      this.renderer,
-      this.camera,
-      this.scene,
-      plane,
-      {
-        resolution: 1024,
-        blur: [19, 80], // 倒影模糊
-        mixBlur: 1.04,
-        mixStrength: 1,
-        mixContrast: 0.7,
-        mirror: 1.8,
-        depthScale: 2,
-        distortion: 2,
-        minDepthThreshold: 0.0, //代表到多远的地方会淡出到没画面
-        maxDepthThreshold: 0.9, //代表从多远的地方开始淡出
-        // resolution: 512,
-        // blur: [30, 19], // 倒影模糊
-        // mixBlur: 1.03,
-        // mixStrength: 1,
-        // mixContrast: 0.5,
-        // mirror: 1.2,
-        // depthScale: 1.2,
-        // distortion: 2,
-        // minDepthThreshold: 0.2, //代表到多远的地方会淡出到没画面
-        // maxDepthThreshold: 0.3, //代表从多远的地方开始淡出
-      }
-    );
-    plane.receiveShadow = true;
-    plane.material.setValues({
-      map: this.floorMap,
-      normalMap: this.floorMapNormal,
-      normalScale: new THREE.Vector2(0, 0.1),
-      roughness: 0.7,
-      metalness: 0.1,
-    });
-    this.mirrorPlane = plane;
+    groundMirror.rotation.x = -Math.PI / 2;
+    this.scene.add(groundMirror);
   }
   creatWater1() {
     const textureLoader = new THREE.TextureLoader();
@@ -351,34 +377,6 @@ export default class ThreePlus {
     });
     this.water1.rotation.x = -Math.PI / 2;
     this.scene.add(this.water1);
-  }
-  testSsaoEffect() {
-    const planeGeometry = new THREE.PlaneGeometry(50, 50);
-    const planeMaterial = new THREE.MeshStandardMaterial({
-      color: 0x999999,
-    });
-    this.plane = new THREE.Mesh(planeGeometry, planeMaterial);
-    this.plane.receiveShadow = true;
-    this.plane.position.set(0, 0, 0);
-    this.plane.rotation.x = -Math.PI / 2;
-    this.scene.add(this.plane);
-
-    const boxMaterial = new THREE.MeshStandardMaterial({
-      color: 0x999999,
-    });
-    const box1Geometry = new THREE.BoxGeometry(1, 1, 2);
-    const box1 = new THREE.Mesh(box1Geometry, boxMaterial);
-    box1.position.set(0, 0.5, 0);
-    box1.castShadow = true;
-    box1.receiveShadow = true;
-    this.scene.add(box1);
-
-    const box2Geometry = new THREE.BoxGeometry(2, 1, 1);
-    const box2 = new THREE.Mesh(box2Geometry, boxMaterial);
-    box2.castShadow = true;
-    box2.receiveShadow = true;
-    this.scene.add(box2);
-    box2.position.set(0.5, 0.5, 0);
   }
   addListenser() {
     window.addEventListener("dblclick", () => {});

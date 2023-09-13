@@ -1,6 +1,5 @@
 varying vec2 vUv;
 uniform float uelapseTime;
-uniform sampler2D uTexture;
 
 // 带背景图水纹
 
