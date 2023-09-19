@@ -23,6 +23,7 @@ import { Water } from "three/examples/jsm/objects/Water";
 // import { Water } from "three/examples/jsm/objects/Water2";
 import MeshReflectorMaterial from "../material/MeshReflectorMaterial";
 import ReflectorMesh from "../material/ReflectorMesh";
+import { CustomPlaneGeometry } from "../material/customPlaneGeometry";
 
 export default class ThreePlus {
   constructor(selector) {
@@ -261,7 +262,8 @@ export default class ThreePlus {
       this.scene.add(this.lion);
       this.models.push(this.lion);
     });
-    this.createMirror1();
+    // this.createMirror1();
+    this.createMirror3();
     // this.createMirror2();
     // this.creatWater1();
   }
@@ -333,6 +335,27 @@ export default class ThreePlus {
       metalness: 0.1,
     });
     this.mirrorPlane = plane;
+  }
+  createMirror3() {
+    this.customPlane = new CustomPlaneGeometry();
+    const outer = [
+      new THREE.Vector2(40.4, -0.5),
+      new THREE.Vector2(-11.4, -0.5),
+      new THREE.Vector2(-11.4, -23.5),
+      new THREE.Vector2(40.4, -23.5),
+    ];
+    const inner = [
+      [
+        new THREE.Vector2(34.6, -7.8),
+        new THREE.Vector2(34.6, -16.18),
+        new THREE.Vector2(-5.5, -16.18),
+        new THREE.Vector2(-5.5, -7.8),
+      ],
+    ];
+    const geometry = this.customPlane.setFromVec2Array(outer, inner);
+    const material = new THREE.MeshBasicMaterial({ color: 0xff000 });
+    const mesh = new THREE.Mesh(geometry, material);
+    this.scene.add(mesh);
   }
   creatWater1() {
     const textureLoader = new THREE.TextureLoader();

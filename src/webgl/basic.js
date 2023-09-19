@@ -1,6 +1,6 @@
-import Shape from "./main/shape";
-import GlslLearn from "./main/glslLearn";
-import Box from "./main/box";
+import Shape from "./basic/shape";
+import GlslLearn from "./basic/glslLearn";
+import Box from "./basic/box";
 
 export default class ThreePlus {
   constructor(dom) {

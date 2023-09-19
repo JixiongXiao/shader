@@ -1,9 +1,9 @@
 varying vec3 vPosition;
 varying vec2 vUv;
 uniform float uelapseTime;
-#define FALLING_SPEED  0.25;
+#define FALLING_SPEED  1.25;
 #define STRIPES_FACTOR 5.0;
-#define PI 3.1415926
+// #define PI 3.1415926
 
 	vec4 permute(vec4 x)
 		{
