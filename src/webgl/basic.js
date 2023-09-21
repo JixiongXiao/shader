@@ -1,6 +1,7 @@
 import Shape from "./basic/shape";
 import GlslLearn from "./basic/glslLearn";
 import Box from "./basic/box";
+import Box3D from "./basic/3dBox";
 
 export default class ThreePlus {
   constructor(dom) {
@@ -21,16 +22,37 @@ export default class ThreePlus {
 
     // 获取webgl上下文
     this.gl = this.canvas.getContext("webgl");
+    this.gl.enable(this.gl.DEPTH_TEST);
     // this.gl.enable(this.gl.CULL_FACE);
   }
   run() {
-    // this.shape = new Shape(this.canvas, this.gl);
+    // this.runShape();
+    // this.runGlslShape();
+    // this.runRotateBox();
+    this.run3DBox();
+    this.render();
+  }
+  runShape() {
+    this.shape = new Shape(this.canvas, this.gl);
     // this.drawLineEvent(); // 注册线段绘制事件
     // this.drawRectEvent();
-    // this.shape.rectangle({x:-0.25, y:-0.5, width:1 * 0.5, height:1, color:[1, 0, 0, 1]});
-    // this.rect = new GlslLearn(this.canvas, this.gl);
+    this.shape.rectangle({
+      x: -0.25,
+      y: -0.5,
+      width: 1 * 0.5,
+      height: 1,
+      color: [1, 0, 0, 1],
+    });
+  }
+  runRotateBox() {
     this.boxShape = new Box(this.canvas, this.gl);
-    this.render();
+  }
+  runGlslShape() {
+    this.rect = new GlslLearn(this.canvas, this.gl);
+  }
+  run3DBox() {
+    this.box3D = new Box3D(this.canvas, this.gl);
+    // this.box3D.start();
   }
   drawLineEvent() {
     window.addEventListener("click", (e) => {
@@ -63,7 +85,7 @@ export default class ThreePlus {
       }
     });
   }
-  render() {
+  rotateBoxRender() {
     this.count += 0.16;
     this.vector.x += 1;
     this.vector.y += 1;
@@ -85,6 +107,11 @@ export default class ThreePlus {
       rotate: this.rotate,
       scale: this.scale,
     });
+    requestAnimationFrame(this.rotateBoxRender.bind(this));
+  }
+  render() {
+    this.boxShape && this.rotateBoxRender();
+    this.box3D && this.box3D.update();
     requestAnimationFrame(this.render.bind(this));
   }
 }
