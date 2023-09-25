@@ -59,9 +59,7 @@ export default class PerspectiveCamera extends Object3D {
     this.pvMatrix = this.projectionMatrix.clone().multiply(this.matrixReverse);
   }
   lookAt(target) {
-    console.log(this.position, target, this.up);
     // 根据位置/目标点/上方向，更新矩阵
-    // console.log(this.matrix.toArray());
     this.matrix.makeTranslation(
       this.position.x,
       this.position.y,
@@ -70,7 +68,6 @@ export default class PerspectiveCamera extends Object3D {
 
     this.matrix.lookAt(target, this.position, this.up);
 
-    console.log(this.matrix.toArray());
     // 根据矩阵，更新旋转的四元数
     this.quaternion.setFromRotationMatrix(this.matrix);
     // 根据四元数，更新旋转的欧拉角

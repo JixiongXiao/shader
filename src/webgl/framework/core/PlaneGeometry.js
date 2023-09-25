@@ -1,0 +1,55 @@
+export default class PlaneGeometry {
+  constructor(width = 1, height = 1) {
+    this.type = "PlaneGeometry";
+    let vertices = [
+      [-0.5 * width, -0.5 * height, 0, 1.0],
+      [-0.5 * width, 0.5 * height, 0, 1.0],
+      [0.5 * width, 0.5 * height, 0, 1.0],
+      [0.5 * width, -0.5 * height, 0, 1.0],
+    ];
+    let faces = [[1, 0, 3, 2]];
+
+    let faceColors = [
+      [1.0, 0.0, 0.0, 1.0],
+      [0.0, 1.0, 0.0, 1.0],
+      [0.0, 0.0, 1.0, 1.0],
+      [1.0, 1.0, 0.0, 1.0],
+    ];
+
+    let uv = [
+      [0, 0],
+      [0, 1],
+      [1, 1],
+      [1, 0],
+    ];
+
+    let points = [];
+    let colors = [];
+    let index = [];
+    faces.forEach((face, i) => {
+      // let faceIndices = [face[0], face[1], face[2], face[0], face[2], face[3]];
+
+      // faceIndices.forEach((index) => {
+      //   points.push(vertices[index]);
+      //   colors.push(faceColors[i]);
+      // });
+      // 生成顶点索引
+      index.push(face[0], face[1], face[2], face[0], face[2], face[3]);
+    });
+
+    this.index = new Uint16Array(index);
+
+    // this.attributes = {
+    //   position: new Float32Array(points.flat()),
+    //   colors: new Float32Array(colors.flat()),
+    // };
+
+    this.attributes = {
+      position: new Float32Array(vertices.flat()),
+      colors: new Float32Array(faceColors.flat()),
+      uv: new Float32Array(uv.flat()),
+    };
+
+    this.bufferData = {};
+  }
+}
