@@ -25,6 +25,9 @@ export default class ThreePlus {
       this.camera,
       this.renderer.domElement
     );
+    this.light = new THR.SpotLight([1, 1, 1, 1], 1);
+    this.light.position.set(0, 0, 5);
+    this.scene.add(this.light);
   }
   initBox() {
     let geometry = new THR.BoxGeometry(1, 1, 1);
