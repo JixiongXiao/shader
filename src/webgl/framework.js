@@ -51,9 +51,12 @@ export default class ThreePlus {
   initSphere() {
     let geometry = new THR.SphereGeometry(1, 32, 32);
     // 创建一个纹理对象
-    let material = new THR.MeshBasicMaterial({
-      color: 0x00ff00,
+    let material = new THR.MeshLambertMaterial({
+      color: [0.5, 0.5, 0.5, 1],
     });
+    // let material = new THR.MeshBasicMaterial({
+    //   color: 0x00ff00,
+    // });
     let loader = new THR.TextureLoader();
     loader.load("./textures/rock.png", (texture) => {
       material.map = texture;

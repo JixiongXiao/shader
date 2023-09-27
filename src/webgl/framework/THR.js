@@ -9,6 +9,7 @@ import OrbitControls from "./core/OribitControls.js";
 import Texture from "./core/Texture.js";
 import TextureLoader from "./core/TextureLoader.js";
 import SphereGeometry from "./core/SphereGeometry.js";
+import MeshLambertMaterial from "./core/MeshLambertMaterial.js";
 export default {
   Scene,
   PerspectiveCamera,
@@ -21,4 +22,5 @@ export default {
   Texture,
   TextureLoader,
   SphereGeometry,
+  MeshLambertMaterial,
 };

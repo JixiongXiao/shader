@@ -68,7 +68,7 @@ export default class Plane {
         },
       },
       vertexShader: vertex,
-      fragmentShader: fragment2,
+      fragmentShader: fragment,
       // fragmentShader: plane9fragment,
     });
     this.mesh = new THREE.Mesh(this.geometry, this.shaderMaterial);

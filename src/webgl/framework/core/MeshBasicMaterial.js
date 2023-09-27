@@ -33,8 +33,8 @@ export default class MeshBasicMaterial {
     uniform sampler2D u_texture;
     void main(){
       vec4 textureColor = texture2D(u_texture,vUv);
-      gl_FragColor = textureColor;
-      // gl_FragColor = vec4(vUv,0.0,1.0);
+      // gl_FragColor = textureColor;
+      gl_FragColor = vec4(vUv,0.0,1.0);
     
     
     }`;
