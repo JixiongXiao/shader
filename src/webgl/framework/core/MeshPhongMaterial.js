@@ -1,6 +1,6 @@
-export default class MeshLambertMaterial {
+export default class MeshPhongMaterial {
   constructor(params) {
-    this.type = "MeshLambertMaterial";
+    this.type = "MeshPhongMaterial";
     this.color = params.color || [1, 1, 1, 1];
     this.isVerticesColor = true;
 
@@ -45,18 +45,19 @@ export default class MeshLambertMaterial {
       uniform vec3 lightDir;
       uniform vec3 lightPos;
       uniform float uLightAngle;
+      // 相机位置
+      uniform vec3 uEye;
   
       void main(){
 
         // vec3 lightPos = vec3(2.0,2.0,10.0);
-        // vec3 lightDir = normalize(lightPos-vPosition);
-        // vec3 lightColor = vec3(1.0,1.0,1.0);
         vec3 lightDirection = normalize(lightPos-vPosition);
+        // vec3 lightColor = vec3(1.0,1.0,1.0);
         vec3 normal = normalize(vNormal);
         // 计算出lamert光照强度，由单位法向量和单位光线方向向量点乘得到
         float lambert = max(dot(normal,lightDirection),0.0);
 
-                // 光线与聚光灯方向的夹角
+        // 光线与聚光灯方向的夹角
         float angle = dot(lightDirection,normalize(lightDir));
 
         // 光线到物体的距离
@@ -66,15 +67,26 @@ export default class MeshLambertMaterial {
         // 聚光灯角度衰减
         float angleStrength = 1.0 - smoothstep(cos(uLightAngle/2.0-0.15),cos(uLightAngle/2.0),angle);
 
+        // lambert = angle < cos(uLightAngle/2.0) ? 0.0:lambert;
         lambert = distanceStrength * angleStrength*lambert;
+
         vec4 textureColor = u_hasTexture==1 ? texture2D(u_texture,vUv):vec4(1.0,1.0,1.0,1.0);
-        // 琅勃特材质 = 光照强度*光照颜色*纹理颜色*材质颜色
-        vec4 finialColor = textureColor*u_color+lambert*vec4(lightColor,1.0)*textureColor*u_color;
+        // gl_FragColor = textureColor;
+        // gl_FragColor = vec4(vUv,0.0,1.0);
+        // 视点看向当前着色点的向量
+        vec3 eyeDirection = normalize(uEye-vPosition);
+        // 入射光与视角的角平分线方向
+        vec3 halfDirection = normalize(lightDirection+eyeDirection);
+        // 高光强度
+        float specular = pow(max(dot(normal,halfDirection),0.0),128.0);
+
+
+        // phong材质 = 光照强度*光照颜色*纹理颜色*材质颜色+高光强度*高光颜色
+        vec4 finialColor = textureColor*u_color+lambert*vec4(lightColor,1.0)*textureColor*u_color+specular*vec4(1.0,1.0,1.0,1.0);
         gl_FragColor = vec4(finialColor.rgb,1.0);
-        // gl_FragColor =u_color * textureColor;
 
         // gl_FragColor = u_color*textureColor;
-       
+      
       
       }`;
   }

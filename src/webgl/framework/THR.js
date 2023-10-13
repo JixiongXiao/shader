@@ -1,5 +1,5 @@
 import Scene from "./core/Scene.js";
-import PerspectiveCamera from "./core/PersepectiveCamera.js";
+import PerspectiveCamera from "./core/PerspectiveCamera.js";
 import PlaneGeometry from "./core/PlaneGeometry.js";
 import BoxGeometry from "./core/BoxGeometry.js";
 import Mesh from "./core/Mesh.js";
@@ -10,6 +10,8 @@ import Texture from "./core/Texture.js";
 import TextureLoader from "./core/TextureLoader.js";
 import SphereGeometry from "./core/SphereGeometry.js";
 import MeshLambertMaterial from "./core/MeshLambertMaterial.js";
+import MeshPhongMaterial from "./core/MeshPhongMaterial.js";
+import MeshDepthMaterial from "./core/MeshDepthMaterial.js";
 import SpotLight from "./core/SpotLight.js";
 export default {
   Scene,
@@ -24,5 +26,7 @@ export default {
   TextureLoader,
   SphereGeometry,
   MeshLambertMaterial,
+  MeshPhongMaterial,
+  MeshDepthMaterial,
   SpotLight,
 };

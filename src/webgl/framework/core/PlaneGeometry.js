@@ -22,7 +22,13 @@ export default class PlaneGeometry {
       [1, 1],
       [1, 0],
     ];
-
+    // 添加normal
+    let normals = [
+      [0, 0, 1],
+      [0, 0, 1],
+      [0, 0, 1],
+      [0, 0, 1],
+    ];
     let points = [];
     let colors = [];
     let index = [];
@@ -48,6 +54,7 @@ export default class PlaneGeometry {
       position: new Float32Array(vertices.flat()),
       colors: new Float32Array(faceColors.flat()),
       uv: new Float32Array(uv.flat()),
+      normal: new Float32Array(normals.flat()),
     };
 
     this.bufferData = {};
