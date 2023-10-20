@@ -1,3 +1,4 @@
+#include <common>
 varying vec2 vUv;
 uniform float uelapseTime;
 uniform sampler2D uTexture;
@@ -17,17 +18,11 @@ float circle(vec2 _st, float _radius){
 
 void main()
 {
-    // vec3 color = vec3(0.0);
     // float color = box(vUv, vec2(0.9));
     // gl_FragColor = vec4(0.3,0.2,0.1, 1.0 - color);
     // float color = circle(vUv, 0.9);
-    // gl_FragColor = vec4(0.3,0.2,0.1, color);
-                          vec3 color1 = vec3(0.25882353,0.392156863,0.8627451);
-                          vec3 color2 = vec3(0.4967, 0.3216, 0.8745);
-                          vec3 colorL = vec3(0.,0.,1.);
-                          vec2 center = vec2(0.5,0.5);
-                          float dis = distance(center,vUv);
-                          vec3 color3 = mix(color1,color2,sqrt(dis));
-                          gl_FragColor = vec4(color3,0.54);
+    vec3 co = vec3(0.3,0.2,0.1);
+    float d = luminance(co);
+    gl_FragColor = vec4(d,d,d, 1.0);
                           
 }

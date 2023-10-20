@@ -14,6 +14,10 @@ export default class MeshPhongMaterial {
             varying vec3 vNormal;
             varying vec3 vPosition;
 
+                        // 转换灯光投影的位置
+            varying vec4 vClipPosLight;
+            uniform mat4 lightShadowPVMatrix;
+
             // 模型矩阵
             uniform mat4 modelMatrix;
             // 视图投影矩阵
@@ -28,6 +32,8 @@ export default class MeshPhongMaterial {
               vNormal = tempNormal.xyz;
               vec4 temPosition = modelMatrix * v_position;
               vPosition = temPosition.xyz;
+
+              
             }
           `;
 
@@ -47,6 +53,21 @@ export default class MeshPhongMaterial {
       uniform float uLightAngle;
       // 相机位置
       uniform vec3 uEye;
+
+      varying vec4 vClipPosLight;
+
+            // 判断是否在阴影里
+      // bool isInShadow(){
+      //   vec3 fragPos = (vClipPosLight.xyz/vClipPosLight.w)/2.0+0.5;
+      //   vec4 shadowFrag = texture2D(u_shadowMap,fragPos.xy);
+      //   return vClipPosLight.z/10.0 > shadowFrag.r;
+      // }
+
+      // float Shadow(){
+      //   vec3 fragPos = (vClipPosLight.xyz/vClipPosLight.w)/2.0+0.5;
+      //   vec4 shadowFrag = texture2D(u_shadowMap,fragPos.xy);
+      //   return shadowFrag.r;
+      // }
   
       void main(){
 

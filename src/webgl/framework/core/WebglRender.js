@@ -172,6 +172,17 @@ export default class WebglRenderer {
       "u_lightIntensity"
     );
     this.gl.uniform1f(intensityLocation, light.intensity);
+
+    // 设置灯光投影矩阵
+    const lightShadowPVMatrixLocation = this.gl.getUniformLocation(
+      program,
+      "lightShadowPVMatrix"
+    );
+    this.gl.uniformMatrix4fv(
+      lightShadowPVMatrixLocation,
+      false,
+      new Float32Array(light.shadow.camera.pvMatrix.toArray())
+    );
   }
   setUniform(program, mesh, camera) {
     // 设置纹理
@@ -186,7 +197,24 @@ export default class WebglRenderer {
     if (camera.position) {
       this.setUniformCameraPosition(program, camera);
     }
+    // 是否有shadowMap纹理
+    if (this.shadowMapTexture) {
+      this.setShadowMapTexture(program, mesh, camera);
+    }
   }
+  setShadowMapTexture(program, mesh) {
+    // 获取纹理位置
+    const textureLocation = this.gl.getUniformLocation(program, "u_shadowMap");
+    // 设置纹理
+    this.gl.uniform1i(textureLocation, 1);
+    // 设置使用了shadowMap纹理
+    const hasShadowMapLocation = this.gl.getUniformLocation(
+      program,
+      "u_hasShadowMap"
+    );
+    this.gl.uniform1i(hasShadowMapLocation, 1);
+  }
+
   setShadowFramebuffer(light) {
     // 纹理对象
     this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, 1);
