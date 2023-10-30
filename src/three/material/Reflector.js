@@ -267,7 +267,7 @@ Reflector.ReflectorShader = {
 			return vec3( blendOverlay( base.r, blend.r ), blendOverlay( base.g, blend.g ), blendOverlay( base.b, blend.b ) );
 
 		}
-  #define GAUSS_SIZE 25 // 高斯模糊尺寸
+  #define GAUSS_SIZE 20 // 高斯模糊尺寸
   #define GAUSS_SIGMA 4.0 // 标准差
   
   float gaussKernel[GAUSS_SIZE];

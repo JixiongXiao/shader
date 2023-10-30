@@ -218,7 +218,7 @@ export default class ThreePlus {
   taskQueue() {
     this.initBackground();
     // this.addListenser();
-    // this.createMesh(); // outline和bloom效果
+    // this.createMesh(); //
     this.loadModel(); // 镜面
   }
   initBackground() {
@@ -273,7 +273,7 @@ export default class ThreePlus {
     mesh.position.set(0, 5, 3);
     this.scene.add(mesh);
     // this.createMirror1();
-    // this.createMirror2();
+    this.createMirror2();
     // this.creatWater1();
   }
   vertexShader() {
