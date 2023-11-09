@@ -16,6 +16,7 @@
     "mitt": "^3.0.0",
     "postprocessing": "^6.29.1",
     "three": "^0.143.0",
+    "three-pathfinding": "^1.2.0",
     "three.meshline": "^1.4.0",
     "three.proton.js": "^0.2.3",
     "vue": "^3.2.13",

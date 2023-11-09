@@ -4,6 +4,7 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+import { Pathfinding, PathfindingHelper } from "three-pathfinding";
 import {
   BloomEffect,
   EffectPass,
@@ -19,7 +20,7 @@ import {
   DepthDownsamplingPass,
   TextureEffect,
 } from "postprocessing";
-
+const ZONE = "level1";
 export default class ThreePlus {
   constructor(selector) {
     this.clock = new THREE.Clock();
@@ -70,7 +71,7 @@ export default class ThreePlus {
       1000
     );
     // 3设置相机位置
-    this.camera.position.set(-5.5, 3.7, 7.5);
+    this.camera.position.set(-15.5, 13.7, 17.5);
     // this.camera.updateProjectionMatrix();
   }
   initRenderer() {
@@ -105,7 +106,7 @@ export default class ThreePlus {
     this.scene.add(this.axesHelper);
   }
   initLight() {
-    this.ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
+    this.ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
     this.scene.add(this.ambientLight);
     this.spotLight = new THREE.PointLight(0xffffff, 0.3);
     this.spotLight.position.set(3, 5, 3);
@@ -171,9 +172,12 @@ export default class ThreePlus {
     this.elapsedTime.value = this.clock.getElapsedTime();
     this.control && this.control.update();
     this.composer.render();
-    this.raycaster.setFromCamera(this.mouse, this.camera);
   }
-  taskQueue() {}
+  taskQueue() {
+    // this.initBackground();
+    this.addListenser();
+    this.initPathFinding();
+  }
   initBackground() {
     const rgbeLoader = new RGBELoader();
     rgbeLoader.load("./textures/powerplant.hdr", (tex) => {
@@ -183,8 +187,61 @@ export default class ThreePlus {
       this.scene.backgroundBlurriness = 1;
     });
   }
+  initPathFinding() {
+    this.pathfinder = new Pathfinding();
+    this.helper = new PathfindingHelper();
+    this.player = new THREE.Vector3(-16, 0, 0);
+    this.target = new THREE.Vector3(-16, 0, 0);
+    this.path = null;
+    this.scene.add(this.helper);
+    const gltfLoader = new GLTFLoader();
+    gltfLoader.load("./model/pathfindingLand.glb", (gltf) => {
+      this.nav = gltf.scene.children[0];
+      // 创建zone
+      const zone = Pathfinding.createZone(this.nav.geometry);
+
+      this.pathfinder.setZoneData(ZONE, zone);
+      const navMesh = new THREE.Mesh(
+        this.nav.geometry,
+        new THREE.MeshBasicMaterial({
+          color: "#081240",
+          opacity: 0.75,
+          transparent: true,
+          side: THREE.DoubleSide,
+          wireframe: true,
+        })
+      );
+
+      this.scene.add(navMesh);
+
+      // Set the player's navigation mesh group
+      this.groupID = this.pathfinder.getGroup(ZONE, this.player);
+      this.helper.setPlayerPosition(this.player);
+    });
+  }
+  handlePathFind(e) {
+    this.player.copy(this.target);
+    this.helper.setPlayerPosition(this.player);
+    const intersects = this.raycaster.intersectObject(this.nav);
+    this.target.copy(intersects[0].point);
+    console.log("target:", this.target);
+
+    // Calculate a path to the target and store it
+    this.path = this.pathfinder.findPath(
+      this.player,
+      this.target,
+      ZONE,
+      this.groupID
+    );
+    console.log(this.path);
+    if (this.path && this.path.length) {
+      this.helper.setPath(this.path);
+    }
+  }
   addListenser() {
-    window.addEventListener("dblclick", () => {});
+    window.addEventListener("dblclick", (e) => {
+      this.handlePathFind(e);
+    });
     window.addEventListener("mousedown", () => {
       this.cameraCanMove = true;
     });

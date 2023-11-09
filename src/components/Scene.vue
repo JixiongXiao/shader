@@ -18,12 +18,13 @@ import gui from "@/three/gui";
 // import ThreePlus from "@/three/scene/Particle.js"; //粒子
 // import ThreePlus from "@/three/scene/MeshLine.js";
 // import ThreePlus from "@/three/scene/mirror.js"; // 镜面特效 multilPass
-import ThreePlus from "@/three/scene/effect.js"; // 镜面高斯模糊，菲涅尔效应
+// import ThreePlus from "@/three/scene/effect.js"; // 镜面高斯模糊，菲涅尔效应
 // import ThreePlus from "@/three/scene/galaxy.js"; // 银河 星空
 // import ThreePlus from "@/three/scene/fatLine.js"; // 宽线
 // import ThreePlus from "@/three/scene/heatMap.js"; // 热力图
 // import ThreePlus from "@/three/scene/wander.js"; // 漫游
 // import ThreePlus from "@/three/scene/weather.js"; // 天气 下雨
+import ThreePlus from "@/three/scene/pathFinding.js"; // 寻路
 // import ThreePlus from "@/webgl/basic.js"; //webgl 基础实现
 // import ThreePlus from "@/webgl/framework.js"; //webgl // 框架实现
 
