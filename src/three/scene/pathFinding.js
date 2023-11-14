@@ -5,6 +5,14 @@ import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader";
 import { DRACOLoader } from "three/examples/jsm/loaders/DRACOLoader";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import { Pathfinding, PathfindingHelper } from "three-pathfinding";
+import { Graph } from "../class/dijkstra";
+import {
+  Brush,
+  Evaluator,
+  ADDITION,
+  SUBTRACTION,
+  INTERSECTION,
+} from "three-bvh-csg";
 import {
   BloomEffect,
   EffectPass,
@@ -40,6 +48,8 @@ export default class ThreePlus {
     this.elapsedTime = {
       value: 0,
     };
+    this.start = null;
+    this.end = null;
     this.init();
   }
 
@@ -49,7 +59,7 @@ export default class ThreePlus {
     this.initRenderer();
     this.initLayers();
     this.initControl();
-    this.initAxesHelper();
+    // this.initAxesHelper();
     this.initComposer();
     this.initLight();
     this.taskQueue();
@@ -86,7 +96,7 @@ export default class ThreePlus {
     // 开启阴影贴图
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    this.renderer.outputEncoding = THREE.sRGBEncoding;
+    this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1;
     // this.renderer.setClearColor('#8AE3C4',1)
@@ -113,7 +123,7 @@ export default class ThreePlus {
     this.spotLight.castShadow = true;
     this.scene.add(this.spotLight);
     const spotLightHelper = new THREE.PointLightHelper(this.spotLight);
-    this.scene.add(spotLightHelper);
+    // this.scene.add(spotLightHelper);
   }
   initComposer() {
     this.composer = new EffectComposer(this.renderer);
@@ -176,7 +186,8 @@ export default class ThreePlus {
   taskQueue() {
     // this.initBackground();
     this.addListenser();
-    this.initPathFinding();
+    this.initPathFindGraph();
+    // this.initPathFindTube();
   }
   initBackground() {
     const rgbeLoader = new RGBELoader();
@@ -187,7 +198,16 @@ export default class ThreePlus {
       this.scene.backgroundBlurriness = 1;
     });
   }
-  initPathFinding() {
+  initPathFindGraph() {
+    const evaluator = new Evaluator();
+    const material = new THREE.MeshStandardMaterial({
+      color: "#A9C3FA",
+      opacity: 0.75,
+      transparent: true,
+      side: THREE.DoubleSide,
+      // wireframe: true,
+    });
+    const geometry = new THREE.BoxGeometry(31, 13, 13);
     this.pathfinder = new Pathfinding();
     this.helper = new PathfindingHelper();
     this.player = new THREE.Vector3(-16, 0, 0);
@@ -197,20 +217,16 @@ export default class ThreePlus {
     const gltfLoader = new GLTFLoader();
     gltfLoader.load("./model/pathfindingLand.glb", (gltf) => {
       this.nav = gltf.scene.children[0];
+      // 创建处理后的mesh
+      // const brush1 = new Brush(this.nav.geometry, material);
+      // const brush2 = new Brush(geometry, material);
+      // this.brush = evaluator.evaluate(brush1, brush2, SUBTRACTION);
+      // this.scene.add(this.brush);
       // 创建zone
       const zone = Pathfinding.createZone(this.nav.geometry);
 
       this.pathfinder.setZoneData(ZONE, zone);
-      const navMesh = new THREE.Mesh(
-        this.nav.geometry,
-        new THREE.MeshBasicMaterial({
-          color: "#081240",
-          opacity: 0.75,
-          transparent: true,
-          side: THREE.DoubleSide,
-          wireframe: true,
-        })
-      );
+      const navMesh = new THREE.Mesh(this.nav.geometry, material);
 
       this.scene.add(navMesh);
 
@@ -219,34 +235,124 @@ export default class ThreePlus {
       this.helper.setPlayerPosition(this.player);
     });
   }
-  handlePathFind(e) {
-    this.player.copy(this.target);
-    this.helper.setPlayerPosition(this.player);
-    const intersects = this.raycaster.intersectObject(this.nav);
-    this.target.copy(intersects[0].point);
-    console.log("target:", this.target);
+  initPathFindTube() {
+    this.boxGroup = new THREE.Group();
+    const geometry = new THREE.BoxGeometry(3, 3, 3);
+    const material = new THREE.MeshBasicMaterial({
+      color: 0xffff00,
+    });
+    const data = {
+      a: new THREE.Vector3(0, 0, 0),
+      b: new THREE.Vector3(15, 0, 1),
+      c: new THREE.Vector3(10, 0, -20),
+      d: new THREE.Vector3(-12, 0, -13),
+      e: new THREE.Vector3(-10, 0, 10),
+      f: new THREE.Vector3(-30, 0, 0),
+    };
+    this.boxData = data;
+    const map = {
+      a: {
+        b: data["a"].distanceTo(data["b"]),
+        c: data["a"].distanceTo(data["c"]),
+        d: data["a"].distanceTo(data["d"]),
+        e: data["a"].distanceTo(data["e"]),
+      },
+      b: {
+        a: data["b"].distanceTo(data["a"]),
+        c: data["b"].distanceTo(data["c"]),
+        e: data["b"].distanceTo(data["e"]),
+      },
+      c: {
+        a: data["c"].distanceTo(data["a"]),
+        b: data["c"].distanceTo(data["b"]),
+        d: data["c"].distanceTo(data["d"]),
+      },
+      d: {
+        a: data["d"].distanceTo(data["a"]),
+        c: data["d"].distanceTo(data["c"]),
+        e: data["d"].distanceTo(data["e"]),
+        f: data["d"].distanceTo(data["f"]),
+      },
+      e: {
+        a: data["e"].distanceTo(data["a"]),
+        b: data["e"].distanceTo(data["b"]),
+        d: data["e"].distanceTo(data["d"]),
+        f: data["e"].distanceTo(data["f"]),
+      },
+      f: {
+        d: data["f"].distanceTo(data["d"]),
+        e: data["f"].distanceTo(data["e"]),
+      },
+    };
+    console.log(map);
+    for (let key in data) {
+      const mesh = new THREE.Mesh(geometry, material);
+      mesh.position.set(data[key].x, data[key].y, data[key].z);
+      mesh.graphId = key;
 
-    // Calculate a path to the target and store it
-    this.path = this.pathfinder.findPath(
-      this.player,
-      this.target,
-      ZONE,
-      this.groupID
-    );
-    console.log(this.path);
-    if (this.path && this.path.length) {
-      this.helper.setPath(this.path);
+      this.boxGroup.add(mesh);
+    }
+    this.scene.add(this.boxGroup);
+    this.graph = new Graph(map);
+  }
+  handlePathFind(e) {
+    if (this.player) {
+      this.player.copy(this.target);
+      this.helper.setPlayerPosition(this.player);
+      const intersects = this.raycaster.intersectObject(this.nav);
+      if (intersects.length === 0) return;
+      this.target.copy(intersects[0].point);
+      console.log("target:", this.target);
+
+      // Calculate a path to the target and store it
+      this.path = this.pathfinder.findPath(
+        this.player,
+        this.target,
+        ZONE,
+        this.groupID
+      );
+      console.log(this.path);
+      if (this.path && this.path.length) {
+        this.helper.setPath(this.path);
+      }
+    } else if (this.graph) {
+      const intersects = this.raycaster.intersectObject(this.boxGroup);
+      if (intersects.length) {
+        if (!this.start) {
+          this.start = intersects[0].object;
+        } else if (this.start && !this.end) {
+          this.end = intersects[0].object;
+          const result = this.graph.findPath(
+            this.start.graphId,
+            this.end.graphId
+          );
+          console.log(this.start);
+          console.log(this.end);
+          console.log(result);
+          const points = [];
+          result.forEach((box) => {
+            points.push(this.boxData[box]);
+          });
+          const lineMaterial = new THREE.LineBasicMaterial({ color: 0x0000ff });
+          const geometry = new THREE.BufferGeometry().setFromPoints(points);
+          this.pathLine = new THREE.Line(geometry, lineMaterial);
+          this.scene.add(this.pathLine);
+        }
+      } else {
+        this.start = null;
+        this.end = null;
+        this.scene.remove(this.pathLine);
+      }
     }
   }
   addListenser() {
-    window.addEventListener("dblclick", (e) => {
-      this.handlePathFind(e);
-    });
+    window.addEventListener("dblclick", (e) => {});
     window.addEventListener("mousedown", () => {
       this.cameraCanMove = true;
     });
-    window.addEventListener("mouseup", () => {
+    window.addEventListener("mouseup", (e) => {
       this.cameraCanMove = false;
+      this.handlePathFind(e);
     });
     window.addEventListener("mousemove", (e) => {
       this.mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
