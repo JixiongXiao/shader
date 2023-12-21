@@ -106,7 +106,7 @@ export default class ThreePlus {
     // this.createPoint();
     // this.createWater();
     // this.createWall(); //墙面特效 4面圆柱体
-    // this.createGrid() // 网格棋盘特效
+    // this.createGrid(); // 网格棋盘特效
     this.createPlane(); // 平面底特效
     // this.createTunnel(); // 巷道
     // this.createPipe(); // 管道

@@ -285,11 +285,9 @@ Reflector.ReflectorShader = {
 		void main() {
 
 			#include <logdepthbuf_fragment>
-   generateGaussKernel();
-			// vec4 base = texture2DProj( tDiffuse, vUv ); // 对拍摄到的场景进行采样
-			// base = vec4( blendOverlay( base.rgb, color ), 1.0 );
-   
 
+      // 高斯模糊
+   generateGaussKernel();
    vec2 texelSize = float(GAUSS_SIZE ) / textureSize*0.5;
    
    vec4 reflectColor = vec4(0.0);
@@ -302,9 +300,12 @@ Reflector.ReflectorShader = {
      reflectColor += gaussKernel[i] * gaussKernel[j] * texture2DProj( tDiffuse, newUv );
     }
    }
-
-
 			gl_FragColor = reflectColor;
+
+      // 无高斯模糊
+      // 			vec4 base = texture2DProj( tDiffuse, vUv ); // 对拍摄到的场景进行采样
+			// base = vec4( blendOverlay( base.rgb, color ), 1.0 );
+      // gl_FragColor = base;
 			#include <encodings_fragment>
 
 		}`,
