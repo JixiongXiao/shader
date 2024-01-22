@@ -16,7 +16,7 @@ import Water from "./water";
 import Points from "./point";
 import Flow from "./flow";
 import BoxEffect from "./box";
-
+import VolumnLight from "./volumnLight";
 export default class ThreePlus {
   constructor(selector) {
     this.clock = new THREE.Clock();
@@ -114,6 +114,12 @@ export default class ThreePlus {
     // this.createExample(); // 练习案例
     // this.createFlyLine() // 创建飞线
     // this.createBox(); // 盒子模型特效
+    // this.createVolumnLigth(); // 体积光
+  }
+  // 创建体积光
+  createVolumnLigth() {
+    this.volumnLight = new VolumnLight();
+    this.scene.add(this.volumnLight.mesh);
   }
   // 创建网格平面
   createGrid() {

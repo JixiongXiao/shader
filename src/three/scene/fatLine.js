@@ -13,6 +13,7 @@ import {
 } from "postprocessing";
 import { PathPointList } from "../material/PathPointList";
 import { PathGeometry } from "../material/PathGeometry";
+import { PathTubeGeometry } from "../material/PathTubeGeometry";
 import { FlowLightSystem } from "../material/flowLight";
 
 export default class ThreePlus {
@@ -173,11 +174,11 @@ export default class ThreePlus {
     requestAnimationFrame(this.render.bind(this));
   }
   taskQueue() {
-    // this.createPath();
+    this.createPath();
     // this.createPathWithMap();
     // this.addListenser();
     // this.initRaycasterEvent();
-    this.createFlowline();
+    // this.createFlowline();
   }
   createPath() {
     const points = [
@@ -195,13 +196,24 @@ export default class ThreePlus {
       arrow: false,
       side: "both",
     });
+    const tubeGeometry = new PathTubeGeometry({
+      pathPointList: pathPointList,
+      options: {
+        radius: 0.1, // default is 0.1
+        radialSegments: 8, // default is 8
+        progress: 1, // default is 1
+        startRad: 0, // default is 0
+      },
+      usage: THREE.StaticDrawUsage,
+    });
     const material = new THREE.MeshStandardMaterial({
       color: 0xfffff,
       depthWrite: true,
       transparent: true,
       opacity: 1,
+      side: THREE.DoubleSide,
     });
-    const mesh = new THREE.Mesh(geometry, material);
+    const mesh = new THREE.Mesh(tubeGeometry, material);
 
     mesh.material.onBeforeCompile = (shader) => {
       (shader.uniforms.uelapseTime = this.elapsedTime),

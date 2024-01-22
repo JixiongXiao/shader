@@ -1,3 +1,5 @@
+#define PI 3.14159265359
+#define TWO_PI 6.28318530718
 varying vec2 vUv;
 uniform float uelapseTime;
 uniform sampler2D uTexture;
@@ -15,11 +17,32 @@ float circle(vec2 _st, float _radius){
     return smoothstep(1.0-_radius,1.0-_radius+_radius*0.2,1.-dot(pos,pos)*3.14);
 }
 
+float polygon(vec2 _st,int num){
+        int N = num;
+    vec2 nSt = vec2(_st.x * 2.0 - 1.0,_st.y*2.0 - 1.0);
+  float a = atan(nSt.x,nSt.y) + PI,
+        r = TWO_PI  / float(N),
+        d = cos(floor(0.5 + a / r) * r - a) * length(nSt);
+    return smoothstep(0.41,0.4,d);
+
+}
+float triangle(vec2 _st){
+        int N = 3;
+    vec2 nSt = vec2(_st.x * 2.0 - 1.0,_st.y*2.0 - 1.0);
+    nSt *= 0.89;
+    nSt.y -= 0.02;
+  float a = atan(nSt.x,nSt.y) + PI,
+        r = TWO_PI  / float(N),
+        d = cos(floor(0.5 + a / r) * r - a) * length(nSt);
+    return smoothstep(0.45,0.4,d);
+
+}
 void main()
 {
     // vec3 color = vec3(0.0);
     // float color = box(vUv, vec2(0.9));
     // gl_FragColor = vec4(0.3,0.2,0.1, 1.0 - color);
-    float color = circle(vUv, 0.6);
-    gl_FragColor = vec4(0.3,0.2,0.1, color);
+    // float color = circle(vUv, 0.6);
+    float color = triangle(vUv);
+    gl_FragColor = vec4(color,0.2,0.1, 1.0);
 }

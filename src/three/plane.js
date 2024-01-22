@@ -12,6 +12,7 @@ import plane6fragment from "./shader/plane/plane6fragment.glsl"; // 动态波动
 import plane7fragment from "./shader/plane/plane7fragment.glsl"; // 动态波动图形
 import plane8fragment from "./shader/plane/plane8fragment.glsl"; // 正方形边框及圆形绘制函数
 import plane9fragment from "./shader/plane/plane9fragment.glsl"; // 箭头
+import plane10fragment from "./shader/plane/plane10fragment.glsl"; // 模拟路灯
 import fragment2 from "./shader/box/boxfragment2.glsl";
 import noise from "./shader/plane/noise.glsl"; // 噪声函数
 import fragment from "./shader/plane/fragment.glsl"; // 测试专用

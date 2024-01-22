@@ -26,7 +26,7 @@ varying float spreadIndex; // 扩散光圈的中轴线 从顶点着色器传入
 //     gl_FragColor = vec4(uColor, alpha);
 
 
-//     // 扩散光环
+//     // 扩散光环v
 //     if(spreadIndex > 0.0) {
 //         float circleAlpha =  (1.0 - strength) *(spreadIndex / uSpreadWidth);
 //         gl_FragColor = mix(gl_FragColor, vec4(uCircleColor,1.0), circleAlpha);
