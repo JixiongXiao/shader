@@ -496,9 +496,6 @@ export default class ThreePlus {
   }
   // 用fatLine做路径
   createPath(points) {
-    const up = new THREE.Vector3(0, 1, 0);
-    const pathPointList = new PathPointList();
-    pathPointList.set(points, 0.5, 10, up, false);
     const geometry = new PathGeometry();
     geometry.update(pathPointList, {
       width: 1.5,

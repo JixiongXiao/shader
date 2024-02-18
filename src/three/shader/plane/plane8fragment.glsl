@@ -16,7 +16,7 @@ float circle(vec2 _st, float _radius){
     vec2 pos = vec2(0.5)-_st;
     return smoothstep(1.0-_radius,1.0-_radius+_radius*0.2,1.-dot(pos,pos)*3.14);
 }
-
+// 多边形 N代表边数
 float polygon(vec2 _st,int num){
         int N = num;
     vec2 nSt = vec2(_st.x * 2.0 - 1.0,_st.y*2.0 - 1.0);
