@@ -26,6 +26,7 @@ float polygon(vec2 _st,int num){
     return smoothstep(0.41,0.4,d);
 
 }
+// 边缘带模糊
 float triangle(vec2 _st){
         int N = 3;
     vec2 nSt = vec2(_st.x * 2.0 - 1.0,_st.y*2.0 - 1.0);
@@ -43,6 +44,7 @@ void main()
     // float color = box(vUv, vec2(0.9));
     // gl_FragColor = vec4(0.3,0.2,0.1, 1.0 - color);
     // float color = circle(vUv, 0.6);
-    float color = triangle(vUv);
+    float color = polygon(vUv,3);
+    // float color = triangle(vUv);
     gl_FragColor = vec4(color,0.2,0.1, 1.0);
 }
