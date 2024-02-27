@@ -44,7 +44,7 @@ void main()
     // float color = box(vUv, vec2(0.9));
     // gl_FragColor = vec4(0.3,0.2,0.1, 1.0 - color);
     // float color = circle(vUv, 0.6);
-    float color = polygon(vUv,3);
+    float color = polygon(vUv,10);
     // float color = triangle(vUv);
     gl_FragColor = vec4(color,0.2,0.1, 1.0);
 }

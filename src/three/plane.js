@@ -10,12 +10,13 @@ import plane4fragment from "./shader/plane/plane4fragment.glsl"; // 正方形转
 import plane5fragment from "./shader/plane/plane5fragment.glsl"; // 动态波动图形
 import plane6fragment from "./shader/plane/plane6fragment.glsl"; // 动态波动图形
 import plane7fragment from "./shader/plane/plane7fragment.glsl"; // 动态波动图形
-import plane8fragment from "./shader/plane/plane8fragment.glsl"; // 正方形边框及圆形绘制函数
+import plane8fragment from "./shader/plane/plane8fragment.glsl"; // 正方形边框,圆形绘制函数,多边形绘制函数
 import plane9fragment from "./shader/plane/plane9fragment.glsl"; // 箭头
 import plane10fragment from "./shader/plane/plane10fragment.glsl"; // 模拟路灯
 import fragment2 from "./shader/box/boxfragment2.glsl";
 import noise from "./shader/plane/noise.glsl"; // 噪声函数
 import fragment from "./shader/plane/fragment.glsl"; // 测试专用
+import sourceCode from "./shader/threeCode/sourceCode.glsl"; // 着色器源码笔记
 
 // 平面着色器特效
 export default class Plane {
@@ -69,8 +70,8 @@ export default class Plane {
         },
       },
       vertexShader: vertex,
-      // fragmentShader: fragment2,
-      fragmentShader: plane8fragment,
+      fragmentShader: fragment,
+      // fragmentShader: plane10fragment,
     });
     this.mesh = new THREE.Mesh(this.geometry, this.shaderMaterial);
   }

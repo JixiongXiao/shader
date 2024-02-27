@@ -13,6 +13,7 @@ import gsap from "gsap";
 import gui from "@/three/gui";
 
 import ThreePlus from "@/three/index.js"; // 着色器以及部分常见特效
+// import ThreePlus from "@/three/shaderLearn/index.js"; //着色器源码学习
 // import ThreePlus from "@/three/scene/insert.js"; //插入功能
 // import ThreePlus from "@/three/scene/animation.js"; //自定义动画使模型根据路径移动
 // import ThreePlus from "@/three/scene/Particle.js"; //粒子
