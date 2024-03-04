@@ -47,6 +47,8 @@ import {
   Noise,
   ApplyForce,
   ApplyCollision,
+  FrameOverLife,
+  RotationOverLife,
 } from "three.quarks";
 
 export default class ThreePlus {
@@ -142,7 +144,7 @@ export default class ThreePlus {
     this.spotLight.castShadow = true;
     this.scene.add(this.spotLight);
     const spotLightHelper = new THREE.PointLightHelper(this.spotLight);
-    this.scene.add(spotLightHelper);
+    // this.scene.add(spotLightHelper);
   }
   initComposer() {
     this.composer = new EffectComposer(this.renderer);
@@ -650,5 +652,72 @@ export default class ThreePlus {
       this.batchRenderer.addSystem(particles);
       this.scene.add(particles.emitter);
     });
+  }
+  //动画帧粒子 烟雾 496
+  initbatchRender8() {
+    this.batchRenderer = new BatchedParticleRenderer();
+    this.scene.add(this.batchRenderer);
+    const texture = new THREE.TextureLoader().load(
+      "./textures/quarks/texture1.png"
+    );
+    const particles = new ParticleSystem({
+      duration: Infinity,
+      looping: true,
+      startLife: new IntervalValue(0.6, 0.8),
+      startSpeed: new IntervalValue(0.1, 2),
+      startSize: new IntervalValue(0.75, 1.5),
+      startColor: new RandomColor(
+        new THREE.Vector4(0.6, 0.6, 0.51, 0.3),
+        new THREE.Vector4(1, 1, 1, 0.5)
+      ),
+      startRotation: new IntervalValue(-Math.PI, Math.PI),
+      worldSpace: true,
+      maxParticles: 1000,
+      emissionOverTime: new ConstantValue(5),
+      emissionBursts: [
+        {
+          time: 0,
+          count: new ConstantValue(0),
+          probability: 1,
+        },
+      ],
+      shape: new ConeEmitter({
+        angle: Math.PI / 9,
+        radius: 0.3,
+        thickness: 1,
+        arc: Math.PI * 2,
+      }),
+      material: new THREE.MeshBasicMaterial({
+        map: texture,
+        blending: THREE.AdditiveBlending,
+        transparent: true,
+        side: THREE.DoubleSide,
+      }),
+      renderMode: RenderMode.BillBoard,
+      renderOrder: 1,
+      startTileIndex: new ConstantValue(81),
+      uTileCount: 10,
+      vTileCount: 10,
+    });
+    particles.emitter.name = "particles";
+
+    particles.addBehavior(
+      // new FrameOverLife(new PiecewiseBezier([[new Bezier(0, 25, 52, 99), 0]]))
+      new FrameOverLife(new PiecewiseBezier([[new Bezier(46, 48, 52, 54), 0]]))
+    );
+    particles.addBehavior(
+      new RotationOverLife(new IntervalValue(-Math.PI / 4, Math.PI / 4))
+    );
+    particles.addBehavior(
+      new ColorOverLife(
+        new ColorRange(
+          new THREE.Vector4(1, 1, 1, 1),
+          new THREE.Vector4(0.5, 0.5, 0.5, 0.1)
+        )
+      )
+    );
+
+    this.batchRenderer.addSystem(particles);
+    this.scene.add(particles.emitter);
   }
 }
